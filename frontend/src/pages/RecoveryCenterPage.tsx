@@ -5,10 +5,8 @@ import {
   X, 
   Terminal, 
   CheckCircle2, 
-  AlertTriangle, 
-  ShieldAlert, 
   ArrowRight,
-  Info
+  ShieldCheck
 } from 'lucide-react';
 import { Recommendation, Incident } from '../types';
 import { ConfirmationDialog } from '../components/ConfirmationDialog';
@@ -43,77 +41,71 @@ export const RecoveryCenterPage: React.FC<RecoveryCenterPageProps> = ({
   const getIncident = (incidentId: string) => incidents.find(i => i.id === incidentId);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-navy-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <span>Recovery Operations Center</span>
-            <span className="text-xs font-normal px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800">
-              Safe Simulated Mitigations
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <span>Recovery Operations</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+              Simulated Remediation
             </span>
           </h1>
-          <p className="text-sm text-slate-400">
-            Strict human-in-the-loop governance for remediation actions, safe sandbox simulation, and telemetry verification.
+          <p className="text-xs text-slate-500">
+            Human-in-the-loop authorization, simulated mitigations, and post-action verification.
           </p>
         </div>
       </div>
 
-      {/* Safety Guardrails Notice Banner */}
-      <div className="p-4 rounded-xl bg-navy-900 border border-cyan-500/30 flex items-start gap-3 shadow-md">
-        <Info className="h-5 w-5 text-cyan-400 shrink-0 mt-0.5" />
-        <div className="text-xs text-slate-300 space-y-1">
-          <p className="font-semibold text-white">
-            Safety Protocol Enforced: Predefined Simulated Remediation Handlers
-          </p>
-          <p className="text-slate-400 leading-relaxed">
-            All recovery executions run in simulated mode without modifying production OS binaries or cloud infrastructure.
-            Automated verification checks post-action telemetry against defined SLA thresholds before declaring incident resolution.
-          </p>
-        </div>
+      {/* Safety Notice Banner */}
+      <div className="p-3 rounded-xl bg-white border border-slate-200 flex items-center gap-2.5 shadow-xs text-xs">
+        <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
+        <span className="text-slate-700">
+          <strong>Safety Protocol Enforced:</strong> All remediation actions run in simulated sandbox mode and verify telemetry against SLA thresholds.
+        </span>
       </div>
 
       {/* Recommendations Cards */}
       {recommendations.length === 0 ? (
-        <div className="text-center py-12 bg-navy-900 rounded-xl border border-navy-800">
-          <Wrench className="h-10 w-10 text-slate-600 mx-auto mb-2" />
-          <p className="text-sm text-slate-300 font-medium">No recovery recommendations currently pending</p>
-          <p className="text-xs text-slate-500 mt-1">
+        <div className="text-center py-10 bg-white rounded-xl border border-slate-200 shadow-xs">
+          <Wrench className="h-8 w-8 text-slate-400 mx-auto mb-2" />
+          <p className="text-xs text-slate-700 font-medium">No recovery recommendations pending</p>
+          <p className="text-[11px] text-slate-500 mt-0.5">
             Launch an autonomous investigation from the Incidents list to generate evidence-backed recovery proposals.
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {recommendations.map((rec) => {
             const inc = getIncident(rec.incident_id);
 
             return (
               <div 
                 key={rec.id}
-                className="p-5 rounded-xl bg-navy-900 border border-navy-800 shadow-sm space-y-4"
+                className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs space-y-3"
               >
                 {/* Header & Status */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-navy-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-cyan-400 font-bold text-xs">
+                    <span className="font-mono text-emerald-800 font-bold text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                       {rec.id}
                     </span>
                     <button
                       onClick={() => onSelectIncident(rec.incident_id, 'workspace')}
-                      className="font-mono text-xs text-slate-300 hover:text-cyan-300 bg-navy-950 px-2 py-0.5 rounded border border-navy-700 flex items-center gap-1"
+                      className="font-mono text-xs text-slate-700 hover:text-emerald-800 bg-slate-50 px-2 py-0.5 rounded border border-slate-200 flex items-center gap-1 font-semibold"
                     >
                       <span>Incident: {rec.incident_id}</span>
                       <ArrowRight className="h-3 w-3" />
                     </button>
                     {inc && (
-                      <span className="text-xs font-mono text-slate-400">
+                      <span className="text-xs font-mono text-slate-500">
                         ({inc.service})
                       </span>
                     )}
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                      rec.risk_level === 'LOW' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' :
-                      rec.risk_level === 'MEDIUM' ? 'bg-amber-950 text-amber-400 border border-amber-800' : 
-                      'bg-red-950 text-red-400 border border-red-800'
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                      rec.risk_level === 'LOW' ? 'bg-emerald-100 text-emerald-800' :
+                      rec.risk_level === 'MEDIUM' ? 'bg-amber-100 text-amber-800' : 
+                      'bg-rose-100 text-rose-800'
                     }`}>
                       {rec.risk_level} RISK
                     </span>
@@ -121,11 +113,11 @@ export const RecoveryCenterPage: React.FC<RecoveryCenterPageProps> = ({
 
                   {/* Status Badge & Actions */}
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs font-semibold px-2.5 py-1 rounded ${
-                      rec.status === 'APPROVED' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' :
-                      rec.status === 'EXECUTED' ? 'bg-purple-950 text-purple-300 border border-purple-800' :
-                      rec.status === 'REJECTED' ? 'bg-red-950 text-red-300 border border-red-800' :
-                      'bg-amber-950 text-amber-300 border border-amber-800'
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                      rec.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                      rec.status === 'EXECUTED' ? 'bg-purple-100 text-purple-800 border border-purple-200' :
+                      rec.status === 'REJECTED' ? 'bg-rose-100 text-rose-800 border border-rose-200' :
+                      'bg-amber-100 text-amber-800 border border-amber-200'
                     }`}>
                       {rec.status}
                     </span>
@@ -135,16 +127,16 @@ export const RecoveryCenterPage: React.FC<RecoveryCenterPageProps> = ({
                       <>
                         <button
                           onClick={() => setActiveDialog({ type: 'APPROVE', rec })}
-                          className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1"
+                          className="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-all flex items-center gap-1"
                         >
-                          <Check className="h-3.5 w-3.5" />
+                          <Check className="h-3 w-3" />
                           <span>Approve</span>
                         </button>
                         <button
                           onClick={() => setActiveDialog({ type: 'REJECT', rec })}
-                          className="px-3 py-1.5 text-xs font-bold rounded-lg bg-red-600/80 hover:bg-red-500 text-white transition-all flex items-center gap-1"
+                          className="px-2.5 py-1 text-xs font-bold rounded-lg bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-all flex items-center gap-1"
                         >
-                          <X className="h-3.5 w-3.5" />
+                          <X className="h-3 w-3" />
                           <span>Reject</span>
                         </button>
                       </>
@@ -154,10 +146,10 @@ export const RecoveryCenterPage: React.FC<RecoveryCenterPageProps> = ({
                     {rec.status === 'APPROVED' && (
                       <button
                         onClick={() => setActiveDialog({ type: 'EXECUTE', rec })}
-                        className="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white shadow-md shadow-cyan-600/30 transition-all flex items-center gap-1.5"
+                        className="px-3 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-all flex items-center gap-1"
                       >
-                        <Terminal className="h-3.5 w-3.5" />
-                        <span>Execute Simulation</span>
+                        <Terminal className="h-3 w-3" />
+                        <span>Execute Recovery</span>
                       </button>
                     )}
 
@@ -165,10 +157,10 @@ export const RecoveryCenterPage: React.FC<RecoveryCenterPageProps> = ({
                     {rec.status === 'EXECUTED' && (
                       <button
                         onClick={() => onVerify(rec.incident_id)}
-                        className="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-purple-600 hover:bg-purple-500 text-white shadow-md shadow-purple-600/30 transition-all flex items-center gap-1.5"
+                        className="px-3 py-1 text-xs font-bold rounded-lg bg-slate-800 hover:bg-slate-900 text-white shadow-xs transition-all flex items-center gap-1"
                       >
-                        <CheckCircle2 className="h-3.5 w-3.5" />
-                        <span>Audit Verification</span>
+                        <CheckCircle2 className="h-3 w-3" />
+                        <span>Verify Telemetry</span>
                       </button>
                     )}
                   </div>
@@ -176,31 +168,31 @@ export const RecoveryCenterPage: React.FC<RecoveryCenterPageProps> = ({
 
                 {/* Details */}
                 <div>
-                  <h3 className="text-base font-bold text-white">
+                  <h3 className="text-sm font-bold text-slate-900">
                     {rec.title}
                   </h3>
-                  <p className="mt-1 text-xs text-slate-300 leading-relaxed">
+                  <p className="mt-1 text-xs text-slate-600">
                     {rec.description}
                   </p>
                 </div>
 
                 {/* Specification Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                  <div className="p-3 rounded-lg bg-navy-950 border border-navy-800">
-                    <span className="text-[10px] font-mono text-emerald-400 uppercase font-semibold block mb-1">Expected Benefit</span>
-                    <span className="text-slate-300">{rec.expected_benefit}</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
+                  <div className="p-2 rounded bg-slate-50 border border-slate-200">
+                    <span className="text-[10px] font-bold text-emerald-800 block">Benefit</span>
+                    <span className="text-slate-700 text-[11px]">{rec.expected_benefit}</span>
                   </div>
-                  <div className="p-3 rounded-lg bg-navy-950 border border-navy-800">
-                    <span className="text-[10px] font-mono text-amber-400 uppercase font-semibold block mb-1">Potential Side Effects</span>
-                    <span className="text-slate-300">{rec.side_effects}</span>
+                  <div className="p-2 rounded bg-slate-50 border border-slate-200">
+                    <span className="text-[10px] font-bold text-amber-800 block">Side Effects</span>
+                    <span className="text-slate-700 text-[11px]">{rec.side_effects}</span>
                   </div>
-                  <div className="p-3 rounded-lg bg-navy-950 border border-navy-800">
-                    <span className="text-[10px] font-mono text-slate-400 uppercase font-semibold block mb-1">Preconditions</span>
-                    <span className="text-slate-300">{rec.preconditions}</span>
+                  <div className="p-2 rounded bg-slate-50 border border-slate-200">
+                    <span className="text-[10px] font-bold text-slate-600 block">Preconditions</span>
+                    <span className="text-slate-700 text-[11px]">{rec.preconditions}</span>
                   </div>
-                  <div className="p-3 rounded-lg bg-navy-950 border border-navy-800">
-                    <span className="text-[10px] font-mono text-cyan-400 uppercase font-semibold block mb-1">Rollback Plan</span>
-                    <span className="text-slate-300">{rec.rollback_plan}</span>
+                  <div className="p-2 rounded bg-slate-50 border border-slate-200">
+                    <span className="text-[10px] font-bold text-slate-800 block">Rollback</span>
+                    <span className="text-slate-700 text-[11px]">{rec.rollback_plan}</span>
                   </div>
                 </div>
               </div>
@@ -214,21 +206,21 @@ export const RecoveryCenterPage: React.FC<RecoveryCenterPageProps> = ({
         <ConfirmationDialog
           isOpen={true}
           title={
-            activeDialog.type === 'APPROVE' ? 'Authorize Recovery Action' :
-            activeDialog.type === 'REJECT' ? 'Reject Recovery Recommendation' :
-            'Execute Simulated Recovery Handler'
+            activeDialog.type === 'APPROVE' ? 'Authorize Recovery' :
+            activeDialog.type === 'REJECT' ? 'Reject Recovery' :
+            'Execute Simulated Recovery'
           }
           message={
             activeDialog.type === 'APPROVE'
-              ? `Are you sure you want to authorize '${activeDialog.rec.title}'? This action carries a ${activeDialog.rec.risk_level} risk level.`
+              ? `Authorize '${activeDialog.rec.title}'? Risk: ${activeDialog.rec.risk_level}.`
               : activeDialog.type === 'REJECT'
-              ? `Provide rejection rationale. This will halt this specific mitigation path for Incident ${activeDialog.rec.incident_id}.`
-              : `Proceed with simulating '${activeDialog.rec.title}' for service ${getIncident(activeDialog.rec.incident_id)?.service}? A safe audit trail will be logged.`
+              ? `Provide rejection rationale. This halts this remediation path for Incident ${activeDialog.rec.incident_id}.`
+              : `Execute simulation for '${activeDialog.rec.title}' on service ${getIncident(activeDialog.rec.incident_id)?.service}?`
           }
           confirmLabel={
-            activeDialog.type === 'APPROVE' ? 'Approve Mitigation' :
-            activeDialog.type === 'REJECT' ? 'Confirm Rejection' :
-            'Execute Safe Simulation'
+            activeDialog.type === 'APPROVE' ? 'Approve' :
+            activeDialog.type === 'REJECT' ? 'Reject' :
+            'Execute'
           }
           isDangerous={activeDialog.type === 'REJECT'}
           onConfirm={() => {
@@ -248,4 +240,3 @@ export const RecoveryCenterPage: React.FC<RecoveryCenterPageProps> = ({
     </div>
   );
 };
-

@@ -39,22 +39,22 @@ export const Navbar: React.FC<NavbarProps> = ({
   const isGemini = systemHealth?.gemini_configured;
 
   return (
-    <header className="border-b border-navy-800 bg-navy-900/90 backdrop-blur sticky top-0 z-40">
+    <header className="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-40 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Platform Name */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => setCurrentTab('dashboard')}>
-            <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+            <div className="h-10 w-10 rounded-lg bg-emerald-600 flex items-center justify-center shadow-md shadow-emerald-600/20">
               <ShieldAlert className="h-6 w-6 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-lg tracking-tight text-white">IncidentIQ</span>
-                <span className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                <span className="font-bold text-lg tracking-tight text-slate-900">IncidentIQ</span>
+                <span className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
                   AI Autonomous
                 </span>
               </div>
-              <p className="text-xs text-slate-400 hidden sm:block">Investigation & Recovery Platform</p>
+              <p className="text-xs text-slate-500 hidden sm:block">Investigation & Recovery Platform</p>
             </div>
           </div>
 
@@ -64,8 +64,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => setCurrentTab('dashboard')}
               className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 currentTab === 'dashboard'
-                  ? 'bg-navy-800 text-cyan-400 border border-cyan-500/30'
-                  : 'text-slate-300 hover:text-white hover:bg-navy-800/60'
+                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 font-semibold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <LayoutDashboard className="h-4 w-4" />
@@ -76,8 +76,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => setCurrentTab('incidents')}
               className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 currentTab === 'incidents'
-                  ? 'bg-navy-800 text-cyan-400 border border-cyan-500/30'
-                  : 'text-slate-300 hover:text-white hover:bg-navy-800/60'
+                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 font-semibold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <ListFilter className="h-4 w-4" />
@@ -89,12 +89,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => setCurrentTab('workspace')}
                 className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   currentTab === 'workspace'
-                    ? 'bg-navy-800 text-cyan-400 border border-cyan-500/30'
-                    : 'text-slate-300 hover:text-white hover:bg-navy-800/60'
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 font-semibold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                <Activity className="h-4 w-4 text-cyan-400 animate-pulse" />
-                Investigation: <span className="font-mono text-xs text-cyan-300">{selectedIncidentId}</span>
+                <Activity className="h-4 w-4 text-emerald-600 animate-pulse" />
+                Investigation: <span className="font-mono text-xs text-emerald-700 font-bold">{selectedIncidentId}</span>
               </button>
             )}
 
@@ -102,8 +102,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => setCurrentTab('recovery')}
               className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 currentTab === 'recovery'
-                  ? 'bg-navy-800 text-cyan-400 border border-cyan-500/30'
-                  : 'text-slate-300 hover:text-white hover:bg-navy-800/60'
+                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 font-semibold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <Wrench className="h-4 w-4" />
@@ -115,8 +115,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => setCurrentTab('report')}
                 className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   currentTab === 'report'
-                    ? 'bg-navy-800 text-cyan-400 border border-cyan-500/30'
-                    : 'text-slate-300 hover:text-white hover:bg-navy-800/60'
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 font-semibold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
                 <FileText className="h-4 w-4" />
@@ -130,8 +130,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Model Badge */}
             <div className={`hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-full text-xs border ${
               isGemini
-                ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300'
-                : 'bg-amber-950/60 border-amber-500/40 text-amber-300'
+                ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                : 'bg-amber-50 border-amber-300 text-amber-800'
             }`}>
               <Cpu className="h-3.5 w-3.5" />
               <span>
@@ -144,16 +144,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={onLoadScenarios}
               disabled={isLoadingScenarios}
               title="Reload synthetic demonstration datasets into database"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-200 border border-navy-700 hover:border-slate-500 transition-all disabled:opacity-50"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition-all disabled:opacity-50"
             >
-              <Database className={`h-3.5 w-3.5 ${isLoadingScenarios ? 'animate-spin text-cyan-400' : ''}`} />
+              <Database className={`h-3.5 w-3.5 ${isLoadingScenarios ? 'animate-spin text-emerald-600' : 'text-slate-600'}`} />
               <span>Reset Data</span>
             </button>
 
             {/* Create Incident Button */}
             <button
               onClick={onOpenCreateModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white shadow-md shadow-cyan-600/20 transition-all active:scale-95"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all active:scale-95"
             >
               <PlusCircle className="h-4 w-4" />
               <span>New Incident</span>

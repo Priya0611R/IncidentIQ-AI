@@ -3,7 +3,6 @@ import {
   AlertOctagon, 
   Activity, 
   CheckCircle2, 
-  XCircle, 
   Clock, 
   ArrowRight, 
   ShieldAlert, 
@@ -16,7 +15,6 @@ import {
   Play,
   Square,
   Zap,
-  RefreshCw,
   BellRing
 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
@@ -32,20 +30,21 @@ interface DashboardPageProps {
   loading: boolean;
 }
 
+// STRICT NO-BLUE PALETTE
 const SEVERITY_COLORS: Record<string, string> = {
-  CRITICAL: '#ef4444',
-  HIGH: '#f97316',
-  MEDIUM: '#eab308',
-  LOW: '#3b82f6',
+  CRITICAL: '#e11d48', // rose-600
+  HIGH: '#ea580c',     // orange-600
+  MEDIUM: '#d97706',   // amber-600
+  LOW: '#64748b',      // slate-500
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  OPEN: '#ef4444',
-  INVESTIGATING: '#06b6d4',
-  MITIGATING: '#8b5cf6',
-  RESOLVED: '#10b981',
-  RECOVERY_FAILED: '#f43f5e',
-  CLOSED: '#64748b',
+  OPEN: '#e11d48',            // rose-600
+  INVESTIGATING: '#059669',   // emerald-600
+  MITIGATING: '#7c3aed',      // violet-600
+  RESOLVED: '#16a34a',        // green-600
+  RECOVERY_FAILED: '#dc2626', // red-600
+  CLOSED: '#64748b',          // slate-500
 };
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({
@@ -66,7 +65,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     try {
       const [monStatus, detList] = await Promise.all([
         apiClient.getMonitoringStatus(),
-        apiClient.getDetections({ limit: 8 })
+        apiClient.getDetections({ limit: 6 })
       ]);
       setMonitoring(monStatus);
       setIsSimulating(monStatus.is_simulating);
@@ -114,9 +113,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
   if (loading && !stats) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-slate-400">
-        <div className="h-10 w-10 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin mb-4" />
-        <p className="text-sm font-medium">Aggregating telemetry and incident stats...</p>
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-slate-500">
+        <div className="h-8 w-8 border-3 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mb-3" />
+        <p className="text-xs font-medium">Loading telemetry...</p>
       </div>
     );
   }
@@ -133,145 +132,143 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     color: STATUS_COLORS[name] || '#94a3b8'
   }));
 
-  const pendingIncidents = incidents.filter(i => i.status === 'MITIGATING' || i.status === 'INVESTIGATING');
-
   return (
-    <div className="space-y-6">
-      {/* Top Banner & Quick Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-navy-800">
+    <div className="space-y-5">
+      {/* Top Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <span>SRE Cloud Operations Command</span>
-            <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800">
-              Live Monitoring
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <span>Operations Command</span>
+            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+              Active Monitoring
             </span>
           </h1>
-          <p className="text-sm text-slate-400">
-            Real-time telemetry, automated AI root-cause hypotheses, and verified mitigations.
+          <p className="text-xs text-slate-500">
+            Real-time telemetry, automated root-cause analysis, and verified recovery.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={onLoadScenarios}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-300 border border-navy-700 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-xs transition-colors"
           >
-            <Database className="h-4 w-4 text-cyan-400" />
-            <span>Load Demo Scenarios</span>
+            <Database className="h-3.5 w-3.5 text-emerald-600" />
+            <span>Load Demo Data</span>
           </button>
           <button
             onClick={onOpenCreate}
-            className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-600/30 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-all active:scale-95"
           >
-            <PlusCircle className="h-4 w-4" />
-            <span>Create Incident</span>
+            <PlusCircle className="h-3.5 w-3.5" />
+            <span>New Incident</span>
           </button>
         </div>
       </div>
 
       {/* KPI Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-        {/* Total Incidents */}
-        <div className="p-4 rounded-xl bg-navy-900 border border-navy-800 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+        {/* Total */}
+        <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Total</span>
-            <Layers className="h-4 w-4 text-slate-500" />
+            <Layers className="h-4 w-4 text-slate-400" />
           </div>
-          <div className="mt-2 text-2xl font-bold text-white">{stats?.total_incidents ?? 0}</div>
-          <div className="mt-1 text-[11px] text-slate-500">Tracked issues</div>
+          <div className="mt-1.5 text-2xl font-bold text-slate-900">{stats?.total_incidents ?? 0}</div>
+          <div className="text-[10px] text-slate-500">Tracked issues</div>
         </div>
 
-        {/* Active Incidents */}
-        <div className="p-4 rounded-xl bg-navy-900 border border-navy-800 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+        {/* Active */}
+        <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Active</span>
-            <Activity className="h-4 w-4 text-cyan-400 animate-pulse" />
+            <Activity className="h-4 w-4 text-emerald-600 animate-pulse" />
           </div>
-          <div className="mt-2 text-2xl font-bold text-cyan-400">{stats?.active_incidents ?? 0}</div>
-          <div className="mt-1 text-[11px] text-cyan-500/80">Requiring attention</div>
+          <div className="mt-1.5 text-2xl font-bold text-emerald-700">{stats?.active_incidents ?? 0}</div>
+          <div className="text-[10px] text-emerald-700/80">Active alerts</div>
         </div>
 
-        {/* Critical Incidents */}
-        <div className="p-4 rounded-xl bg-navy-900 border border-navy-800 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+        {/* Critical */}
+        <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Critical</span>
-            <AlertOctagon className="h-4 w-4 text-red-400" />
+            <AlertOctagon className="h-4 w-4 text-rose-600" />
           </div>
-          <div className="mt-2 text-2xl font-bold text-red-400">{stats?.critical_incidents ?? 0}</div>
-          <div className="mt-1 text-[11px] text-red-500/80">SLA Critical P0/P1</div>
+          <div className="mt-1.5 text-2xl font-bold text-rose-600">{stats?.critical_incidents ?? 0}</div>
+          <div className="text-[10px] text-rose-600/80">SLA Critical P0/P1</div>
         </div>
 
-        {/* Under Investigation */}
-        <div className="p-4 rounded-xl bg-navy-900 border border-navy-800 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+        {/* Investigating */}
+        <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Investigating</span>
-            <Sparkles className="h-4 w-4 text-blue-400" />
+            <Sparkles className="h-4 w-4 text-violet-600" />
           </div>
-          <div className="mt-2 text-2xl font-bold text-blue-400">{stats?.under_investigation ?? 0}</div>
-          <div className="mt-1 text-[11px] text-blue-500/80">AI agent active</div>
+          <div className="mt-1.5 text-2xl font-bold text-violet-700">{stats?.under_investigation ?? 0}</div>
+          <div className="text-[10px] text-violet-700/80">Agent active</div>
         </div>
 
-        {/* Pending Approvals */}
-        <div className="p-4 rounded-xl bg-navy-900 border border-navy-800 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+        {/* Approvals */}
+        <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Approvals</span>
-            <Wrench className="h-4 w-4 text-amber-400" />
+            <Wrench className="h-4 w-4 text-amber-600" />
           </div>
-          <div className="mt-2 text-2xl font-bold text-amber-400">{stats?.pending_approvals ?? 0}</div>
-          <div className="mt-1 text-[11px] text-amber-500/80">Awaiting human sign-off</div>
+          <div className="mt-1.5 text-2xl font-bold text-amber-600">{stats?.pending_approvals ?? 0}</div>
+          <div className="text-[10px] text-amber-700/80">Awaiting sign-off</div>
         </div>
 
-        {/* Successfully Recovered */}
-        <div className="p-4 rounded-xl bg-navy-900 border border-navy-800 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+        {/* Recovered */}
+        <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Recovered</span>
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
           </div>
-          <div className="mt-2 text-2xl font-bold text-emerald-400">{stats?.recovered_incidents ?? 0}</div>
-          <div className="mt-1 text-[11px] text-emerald-500/80">Verified healthy</div>
+          <div className="mt-1.5 text-2xl font-bold text-emerald-600">{stats?.recovered_incidents ?? 0}</div>
+          <div className="text-[10px] text-emerald-700/80">Verified healthy</div>
         </div>
 
-        {/* Failed Recoveries / Avg MTTR */}
-        <div className="p-4 rounded-xl bg-navy-900 border border-navy-800 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+        {/* Avg MTTR */}
+        <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Avg MTTR</span>
-            <Clock className="h-4 w-4 text-purple-400" />
+            <Clock className="h-4 w-4 text-slate-500" />
           </div>
-          <div className="mt-2 text-2xl font-bold text-purple-400">
+          <div className="mt-1.5 text-2xl font-bold text-slate-900">
             {stats?.avg_investigation_duration_seconds ? `${stats.avg_investigation_duration_seconds}s` : '12s'}
           </div>
-          <div className="mt-1 text-[11px] text-purple-500/80">Investigation speed</div>
+          <div className="text-[10px] text-slate-500">Investigation time</div>
         </div>
       </div>
 
-      {/* Autonomous Ingestion & Live Telemetry Monitoring Console */}
-      <div className="p-5 rounded-xl bg-gradient-to-r from-navy-900 via-navy-900 to-navy-950 border border-cyan-900/40 shadow-lg">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-navy-800">
+      {/* Autonomous Ingestion Console */}
+      <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className={`p-2.5 rounded-lg border ${
+            <div className={`p-2 rounded-lg border ${
               monitoring?.active_provider === 'PROMETHEUS'
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
                 : isSimulating
-                ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400'
-                : 'bg-slate-800 border-slate-700 text-slate-400'
+                ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
+                : 'bg-slate-50 border-slate-200 text-slate-600'
             }`}>
-              <Radio className={`h-5 w-5 ${isSimulating ? 'animate-pulse text-cyan-400' : ''}`} />
+              <Radio className={`h-4 w-4 ${isSimulating ? 'animate-pulse text-emerald-600' : ''}`} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-white">Autonomous Ingestion & Telemetry Monitor</h3>
+                <h3 className="text-sm font-bold text-slate-900">Telemetry Ingestion Engine</h3>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase border ${
                   monitoring?.active_provider === 'PROMETHEUS'
-                    ? 'bg-emerald-950 text-emerald-400 border-emerald-700'
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
                     : isSimulating
-                    ? 'bg-cyan-950 text-cyan-300 border-cyan-700 animate-pulse'
-                    : 'bg-navy-950 text-slate-400 border-navy-800'
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-300 animate-pulse'
+                    : 'bg-slate-100 text-slate-700 border-slate-200'
                 }`}>
-                  {monitoring?.mode_label || 'AWAITING TELEMETRY'}
+                  {monitoring?.mode_label || 'READY'}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
-                Continuous signal ingestion, multi-tier anomaly detection, automatic event correlation, and autonomous background investigation.
+              <p className="text-[11px] text-slate-500">
+                Continuous signal ingestion, anomaly evaluation, and automatic incident correlation.
               </p>
             </div>
           </div>
@@ -282,31 +279,31 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               value={selectedScenario}
               onChange={(e) => setSelectedScenario(e.target.value)}
               disabled={isSimulating || actionLoading}
-              className="bg-navy-950 text-slate-200 border border-navy-700 rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-cyan-500 outline-none disabled:opacity-50"
+              className="bg-slate-50 text-slate-800 border border-slate-300 rounded-lg px-2.5 py-1 text-xs focus:ring-1 focus:ring-emerald-500 outline-none disabled:opacity-50"
             >
-              <option value="SCENARIO_DB_POOL_EXHAUSTION">Scenario: DB Pool Saturation (orders-service)</option>
-              <option value="SCENARIO_CHECKOUT_GATEWAY_TIMEOUT">Scenario: 504 Gateway Timeout (checkout-service)</option>
-              <option value="SCENARIO_DNS_SERVFAIL">Scenario: DNS SERVFAIL Storm (auth-service)</option>
-              <option value="SCENARIO_MTU_FRAGMENTATION">Scenario: VPC MTU Dropping (notification-service)</option>
+              <option value="SCENARIO_DB_POOL_EXHAUSTION">DB Pool Saturation (orders-service)</option>
+              <option value="SCENARIO_CHECKOUT_GATEWAY_TIMEOUT">504 Gateway Timeout (checkout-service)</option>
+              <option value="SCENARIO_DNS_SERVFAIL">DNS SERVFAIL Storm (auth-service)</option>
+              <option value="SCENARIO_MTU_FRAGMENTATION">VPC MTU Packet Drop (notification-service)</option>
             </select>
 
             {isSimulating ? (
               <button
                 onClick={handleStopSimulation}
                 disabled={actionLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-500 text-white text-xs font-semibold shadow-sm transition-all"
+                className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-xs transition-all"
               >
-                <Square className="h-3.5 w-3.5" />
+                <Square className="h-3 w-3" />
                 <span>Stop Engine</span>
               </button>
             ) : (
               <button
                 onClick={handleStartSimulation}
                 disabled={actionLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-sm transition-all"
+                className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-all"
               >
-                <Play className="h-3.5 w-3.5" />
-                <span>Start Autonomous Engine</span>
+                <Play className="h-3 w-3" />
+                <span>Start Engine</span>
               </button>
             )}
 
@@ -314,37 +311,37 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               onClick={handleTriggerTick}
               disabled={actionLoading}
               title="Immediately inject a synthetic failure telemetry tick across services"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-200 border border-navy-700 text-xs font-medium transition-all"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-medium transition-all"
             >
-              <Zap className="h-3.5 w-3.5 text-amber-400" />
-              <span>Inject Anomaly Tick</span>
+              <Zap className="h-3 w-3 text-amber-600" />
+              <span>Inject Anomaly</span>
             </button>
           </div>
         </div>
 
         {/* Telemetry Stream Health Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-xs">
-          <div className="bg-navy-950/60 p-2.5 rounded-lg border border-navy-800">
-            <span className="text-slate-400 block text-[11px]">Telemetry Ingested (24h)</span>
-            <span className="text-slate-100 font-mono font-bold text-sm">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3 text-xs">
+          <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
+            <span className="text-slate-500 block text-[10px]">Ingested Telemetry (24h)</span>
+            <span className="text-slate-900 font-mono font-bold text-xs">
               {monitoring?.total_telemetry_records ?? 0} records
             </span>
           </div>
-          <div className="bg-navy-950/60 p-2.5 rounded-lg border border-navy-800">
-            <span className="text-slate-400 block text-[11px]">Active Anomaly Detections</span>
-            <span className="text-amber-400 font-mono font-bold text-sm">
+          <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
+            <span className="text-slate-500 block text-[10px]">Active Anomaly Detections</span>
+            <span className="text-amber-700 font-mono font-bold text-xs">
               {monitoring?.active_detections ?? 0} active
             </span>
           </div>
-          <div className="bg-navy-950/60 p-2.5 rounded-lg border border-navy-800">
-            <span className="text-slate-400 block text-[11px]">Ingestion Freshness</span>
-            <span className="text-slate-300 font-mono text-[11px]">
+          <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
+            <span className="text-slate-500 block text-[10px]">Freshness</span>
+            <span className="text-slate-700 font-mono text-[11px]">
               {monitoring?.latest_telemetry_at ? new Date(monitoring.latest_telemetry_at).toLocaleTimeString() : 'Awaiting data'}
             </span>
           </div>
-          <div className="bg-navy-950/60 p-2.5 rounded-lg border border-navy-800">
-            <span className="text-slate-400 block text-[11px]">Webhook Endpoint</span>
-            <span className="text-cyan-400 font-mono text-[11px] truncate block" title="/api/monitoring/webhooks/prometheus">
+          <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
+            <span className="text-slate-500 block text-[10px]">Webhook Ingestion URL</span>
+            <span className="text-emerald-700 font-mono text-[10px] truncate block" title="/api/monitoring/webhooks/prometheus">
               /api/monitoring/webhooks/prometheus
             </span>
           </div>
@@ -352,40 +349,38 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
         {/* Live Detected Anomalies Feed */}
         {detections.length > 0 && (
-          <div className="mt-4 pt-3 border-t border-navy-800/80">
+          <div className="mt-3 pt-2.5 border-t border-slate-100">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                <BellRing className="h-3.5 w-3.5 text-cyan-400" />
-                Recent Anomaly Detections & Correlated Incidents
+              <span className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                <BellRing className="h-3 w-3 text-emerald-600" />
+                Live Anomaly Detections
               </span>
-              <span className="text-[11px] text-slate-400">Auto-correlated into background jobs</span>
+              <span className="text-[10px] text-slate-500">Auto-correlated</span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-44 overflow-y-auto pr-1">
               {detections.map((d) => (
                 <div
                   key={d.id}
                   onClick={() => d.incident_id && onSelectIncident(d.incident_id, 'workspace')}
-                  className={`p-2.5 rounded-lg bg-navy-950/80 border text-xs transition-colors ${
-                    d.incident_id ? 'border-cyan-800/60 hover:border-cyan-500 cursor-pointer' : 'border-navy-800'
+                  className={`p-2 rounded-lg bg-slate-50 border text-xs transition-colors ${
+                    d.incident_id ? 'border-slate-300 hover:border-emerald-500 cursor-pointer' : 'border-slate-200'
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono font-semibold text-cyan-300">{d.service}</span>
-                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                      d.severity === 'CRITICAL' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-300'
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="font-mono font-semibold text-slate-900">{d.service}</span>
+                    <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${
+                      d.severity === 'CRITICAL' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
                     }`}>
                       {d.detection_type}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-300 mt-1 line-clamp-1">{d.explanation}</p>
-                  <div className="flex items-center justify-between mt-1 text-[10px] text-slate-400">
+                  <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-1">{d.explanation}</p>
+                  <div className="flex items-center justify-between mt-1 text-[10px] text-slate-500">
                     <span>{new Date(d.created_at).toLocaleTimeString()}</span>
-                    {d.incident_id ? (
-                      <span className="text-cyan-400 font-mono hover:underline flex items-center gap-0.5">
-                        Incident: {d.incident_id} <ArrowRight className="h-2.5 w-2.5" />
+                    {d.incident_id && (
+                      <span className="text-emerald-700 font-mono font-semibold hover:underline flex items-center gap-0.5">
+                        {d.incident_id} <ArrowRight className="h-2.5 w-2.5" />
                       </span>
-                    ) : (
-                      <span className="text-slate-500 italic">Correlating...</span>
                     )}
                   </div>
                 </div>
@@ -397,21 +392,21 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
       {/* Distribution Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Severity Distribution */}
-        <div className="p-5 rounded-xl bg-navy-900 border border-navy-800">
-          <h3 className="text-sm font-semibold text-white mb-4 flex items-center justify-between">
-            <span>Incident Severity Distribution</span>
-            <span className="text-xs text-slate-400 font-normal">Active & Resolved</span>
+        {/* Severity */}
+        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+          <h3 className="text-sm font-semibold text-slate-900 mb-3 flex items-center justify-between">
+            <span>Severity Distribution</span>
+            <span className="text-xs text-slate-500 font-normal">Active & Resolved</span>
           </h3>
-          <div className="h-56 w-full">
+          <div className="h-52 w-full">
             {sevData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={sevData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <XAxis dataKey="name" stroke="#64748b" fontSize={11} />
-                  <YAxis stroke="#64748b" fontSize={11} allowDecimals={false} />
+                <BarChart data={sevData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                  <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} />
+                  <YAxis stroke="#94a3b8" fontSize={11} allowDecimals={false} />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#0b1120', borderColor: '#1e3056', borderRadius: '8px', color: '#f1f5f9' }}
-                    itemStyle={{ color: '#38bdf8' }}
+                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', color: '#0f172a' }}
+                    itemStyle={{ color: '#059669' }}
                   />
                   <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                     {sevData.map((entry, index) => (
@@ -421,20 +416,20 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-full text-slate-500 text-xs">
+              <div className="flex items-center justify-center h-full text-slate-400 text-xs">
                 No incident data available
               </div>
             )}
           </div>
         </div>
 
-        {/* Status Distribution */}
-        <div className="p-5 rounded-xl bg-navy-900 border border-navy-800">
-          <h3 className="text-sm font-semibold text-white mb-4 flex items-center justify-between">
-            <span>Workflow Status Breakdown</span>
-            <span className="text-xs text-slate-400 font-normal">Current Pipeline</span>
+        {/* Status */}
+        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+          <h3 className="text-sm font-semibold text-slate-900 mb-3 flex items-center justify-between">
+            <span>Workflow Status</span>
+            <span className="text-xs text-slate-500 font-normal">Pipeline breakdown</span>
           </h3>
-          <div className="h-56 w-full flex items-center justify-center">
+          <div className="h-44 w-full flex items-center justify-center">
             {statData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -442,8 +437,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     data={statData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={55}
-                    outerRadius={80}
+                    innerRadius={50}
+                    outerRadius={75}
                     paddingAngle={3}
                     dataKey="value"
                   >
@@ -452,20 +447,20 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     ))}
                   </Pie>
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#0b1120', borderColor: '#1e3056', borderRadius: '8px', color: '#f1f5f9' }}
+                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', color: '#0f172a' }}
                   />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="text-slate-500 text-xs">No status data available</div>
+              <div className="text-slate-400 text-xs">No status data available</div>
             )}
           </div>
           {/* Legend */}
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs">
             {statData.map(s => (
               <div key={s.name} className="flex items-center gap-1.5">
-                <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.color }} />
-                <span className="text-slate-400 font-mono text-[11px]">{s.name}: {s.value}</span>
+                <div className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} />
+                <span className="text-slate-600 font-mono text-[11px]">{s.name}: {s.value}</span>
               </div>
             ))}
           </div>
@@ -473,15 +468,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       </div>
 
       {/* Recent Incidents Table */}
-      <div className="p-5 rounded-xl bg-navy-900 border border-navy-800">
-        <div className="flex items-center justify-between mb-4">
+      <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+        <div className="flex items-center justify-between mb-3">
           <div>
-            <h3 className="text-base font-semibold text-white">Recent Incident Stream</h3>
-            <p className="text-xs text-slate-400">Live operational incidents across cloud services</p>
+            <h3 className="text-sm font-bold text-slate-900">Recent Incidents</h3>
+            <p className="text-[11px] text-slate-500">Production incidents requiring investigation & recovery</p>
           </div>
           <button
             onClick={() => onSelectIncident('', 'incidents')}
-            className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1 transition-colors"
+            className="text-xs text-emerald-700 hover:text-emerald-800 font-medium flex items-center gap-1 transition-colors"
           >
             <span>View All</span>
             <ArrowRight className="h-3.5 w-3.5" />
@@ -489,13 +484,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
 
         {incidents.length === 0 ? (
-          <div className="text-center py-10 bg-navy-950/50 rounded-lg border border-dashed border-navy-800">
-            <ShieldAlert className="h-10 w-10 text-slate-600 mx-auto mb-2" />
-            <p className="text-sm text-slate-300 font-medium">No incidents currently recorded in database</p>
-            <p className="text-xs text-slate-500 mt-1">Click "Load Demo Scenarios" to explore realistic enterprise failures.</p>
+          <div className="text-center py-8 bg-slate-50 rounded-lg border border-dashed border-slate-300">
+            <ShieldAlert className="h-8 w-8 text-slate-400 mx-auto mb-2" />
+            <p className="text-xs text-slate-700 font-medium">No incidents currently recorded</p>
             <button
               onClick={onLoadScenarios}
-              className="mt-4 px-4 py-2 text-xs font-semibold rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white transition-all"
+              className="mt-3 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-all"
             >
               Load Demo Scenarios
             </button>
@@ -503,55 +497,55 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-navy-950/70 text-slate-400 font-mono uppercase text-[10px] border-b border-navy-800">
+              <thead className="bg-slate-50 text-slate-600 font-mono uppercase text-[10px] border-b border-slate-200">
                 <tr>
-                  <th className="py-2.5 px-3">Incident ID</th>
-                  <th className="py-2.5 px-3">Title</th>
-                  <th className="py-2.5 px-3">Service</th>
-                  <th className="py-2.5 px-3">Severity</th>
-                  <th className="py-2.5 px-3">Status</th>
-                  <th className="py-2.5 px-3 text-right">Actions</th>
+                  <th className="py-2 px-3">ID</th>
+                  <th className="py-2 px-3">Incident</th>
+                  <th className="py-2 px-3">Service</th>
+                  <th className="py-2 px-3">Severity</th>
+                  <th className="py-2 px-3">Status</th>
+                  <th className="py-2 px-3 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-navy-800/60 font-sans">
+              <tbody className="divide-y divide-slate-100 font-sans">
                 {incidents.slice(0, 6).map((inc) => (
                   <tr 
                     key={inc.id}
                     onClick={() => onSelectIncident(inc.id, 'workspace')}
-                    className="hover:bg-navy-800/40 cursor-pointer transition-colors group"
+                    className="hover:bg-slate-50 cursor-pointer transition-colors group"
                   >
-                    <td className="py-3 px-3 font-mono font-medium text-cyan-400">
+                    <td className="py-2.5 px-3 font-mono font-semibold text-emerald-700">
                       {inc.id}
                     </td>
-                    <td className="py-3 px-3 text-slate-200 font-medium max-w-xs truncate group-hover:text-white">
+                    <td className="py-2.5 px-3 text-slate-900 font-medium max-w-xs truncate group-hover:text-emerald-800">
                       {inc.title}
                     </td>
-                    <td className="py-3 px-3 font-mono text-slate-400 text-[11px]">
+                    <td className="py-2.5 px-3 font-mono text-slate-600 text-[11px]">
                       {inc.service}
                     </td>
-                    <td className="py-3 px-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wider ${
-                        inc.severity === 'CRITICAL' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
-                        inc.severity === 'HIGH' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
-                        inc.severity === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' :
-                        'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                    <td className="py-2.5 px-3">
+                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                        inc.severity === 'CRITICAL' ? 'bg-rose-100 text-rose-800 border border-rose-200' :
+                        inc.severity === 'HIGH' ? 'bg-orange-100 text-orange-800 border border-orange-200' :
+                        inc.severity === 'MEDIUM' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
+                        'bg-slate-100 text-slate-700 border border-slate-200'
                       }`}>
                         {inc.severity}
                       </span>
                     </td>
-                    <td className="py-3 px-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${
-                        inc.status === 'RESOLVED' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                        inc.status === 'RECOVERY_FAILED' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
-                        inc.status === 'INVESTIGATING' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 animate-pulse' :
-                        inc.status === 'MITIGATING' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' :
-                        'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                    <td className="py-2.5 px-3">
+                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                        inc.status === 'RESOLVED' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                        inc.status === 'RECOVERY_FAILED' ? 'bg-rose-100 text-rose-800 border border-rose-200' :
+                        inc.status === 'INVESTIGATING' ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 animate-pulse' :
+                        inc.status === 'MITIGATING' ? 'bg-purple-100 text-purple-800 border border-purple-200' :
+                        'bg-amber-100 text-amber-800 border border-amber-200'
                       }`}>
                         {inc.status}
                       </span>
                     </td>
-                    <td className="py-3 px-3 text-right">
-                      <span className="text-cyan-400 group-hover:text-cyan-300 text-xs font-medium inline-flex items-center gap-1">
+                    <td className="py-2.5 px-3 text-right">
+                      <span className="text-emerald-700 group-hover:text-emerald-800 text-xs font-semibold inline-flex items-center gap-1">
                         Investigate <ArrowRight className="h-3 w-3" />
                       </span>
                     </td>
@@ -565,4 +559,3 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     </div>
   );
 };
-

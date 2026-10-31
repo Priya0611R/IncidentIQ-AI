@@ -251,6 +251,18 @@ def get_incident_evidence(incident_id: str, db: Session = Depends(get_db)):
         Evidence.incident_id == incident_id
     ).order_by(Evidence.created_at.desc()).all()
 
+    # If no evidence exists yet, automatically gather verified telemetry & diagnostic records
+    if not items:
+        inc = db.query(Incident).filter(Incident.id == incident_id).first()
+        if inc:
+            try:
+                investigation_agent.run_investigation(db, incident_id)
+                items = db.query(Evidence).filter(
+                    Evidence.incident_id == incident_id
+                ).order_by(Evidence.created_at.desc()).all()
+            except Exception:
+                pass
+
     results = []
     for it in items:
         try:

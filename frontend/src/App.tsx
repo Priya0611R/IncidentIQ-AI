@@ -240,7 +240,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-navy-950 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Navbar */}
       <Navbar
         currentTab={currentTab}
@@ -325,17 +325,17 @@ export function App() {
         onCreated={handleCreatedIncident}
       />
 
-      {/* Toast Notification Notification Pill */}
+      {/* Toast Notification Pill */}
       {toast && (
         <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 duration-200">
-          <div className={`flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold border ${
-            toast.type === 'success' ? 'bg-emerald-950 border-emerald-500/40 text-emerald-200' :
-            toast.type === 'error' ? 'bg-rose-950 border-rose-500/40 text-rose-200' :
-            'bg-navy-900 border-cyan-500/40 text-cyan-200'
+          <div className={`flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl text-xs font-semibold border ${
+            toast.type === 'success' ? 'bg-emerald-50 border-emerald-300 text-emerald-900' :
+            toast.type === 'error' ? 'bg-rose-50 border-rose-300 text-rose-900' :
+            'bg-white border-slate-300 text-slate-800'
           }`}>
-            {toast.type === 'success' && <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />}
-            {toast.type === 'error' && <AlertCircle className="h-4 w-4 text-rose-400 shrink-0" />}
-            {toast.type === 'info' && <Info className="h-4 w-4 text-cyan-400 shrink-0" />}
+            {toast.type === 'success' && <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />}
+            {toast.type === 'error' && <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" />}
+            {toast.type === 'info' && <Info className="h-4 w-4 text-emerald-600 shrink-0" />}
             <span>{toast.message}</span>
           </div>
         </div>

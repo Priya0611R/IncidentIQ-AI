@@ -1,17 +1,36 @@
 import os
 import json
+import logging
 from datetime import datetime
 from sqlalchemy.orm import Session
 from app.models.models import Incident, TimelineEvent, Evidence
 from app.services.evidence_service import evidence_service
+from app.agents.investigation_agent import investigation_agent
+
+logger = logging.getLogger(__name__)
 
 def load_initial_scenarios(db: Session, force_reload: bool = False):
     """
-    Populates sample scenarios into the SQLite database if empty or upon manual request.
+    Populates sample scenarios into the SQLite database if empty or upon manual request,
+    and pre-populates verified telemetry evidence, hypotheses, and recovery actions.
     """
     count = db.query(Incident).count()
     if count > 0 and not force_reload:
-        return {"message": f"Database already contains {count} incidents.", "loaded_count": 0}
+        # Ensure existing incidents have evidence pre-seeded if empty
+        incidents = db.query(Incident).all()
+        seeded_evidence = 0
+        for inc in incidents:
+            ev_count = db.query(Evidence).filter(Evidence.incident_id == inc.id).count()
+            if ev_count == 0:
+                try:
+                    investigation_agent.run_investigation(db, inc.id)
+                    seeded_evidence += 1
+                except Exception as e:
+                    logger.warning(f"Failed to auto-seed evidence for {inc.id}: {e}")
+        return {
+            "message": f"Database contains {count} incidents ({seeded_evidence} newly seeded with evidence).",
+            "loaded_count": 0
+        }
 
     df = evidence_service.incidents_df
     if df.empty:
@@ -66,8 +85,15 @@ def load_initial_scenarios(db: Session, force_reload: bool = False):
             created_at=created_dt
         )
         db.add(tl)
+        db.commit()
+
+        # Pre-seed verified telemetry evidence, diagnostics, and hypotheses for each incident
+        try:
+            investigation_agent.run_investigation(db, inc_id)
+        except Exception as e:
+            logger.warning(f"Could not pre-run investigation for {inc_id}: {e}")
+
         loaded += 1
 
-    db.commit()
-    return {"message": f"Successfully loaded {loaded} incident scenarios.", "loaded_count": loaded}
+    return {"message": f"Successfully loaded {loaded} incident scenarios with verified evidence.", "loaded_count": loaded}
 

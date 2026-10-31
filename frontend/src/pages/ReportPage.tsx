@@ -4,7 +4,6 @@ import {
   FileText, 
   CheckCircle2, 
   XCircle, 
-  ShieldAlert, 
   ArrowLeft,
   Copy,
   Check
@@ -26,9 +25,9 @@ export const ReportPage: React.FC<ReportPageProps> = ({
 
   if (loading || !report) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-slate-400">
-        <div className="h-10 w-10 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin mb-4" />
-        <p className="text-sm font-medium">Generating executive incident post-mortem report...</p>
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-slate-500">
+        <div className="h-8 w-8 border-3 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mb-3" />
+        <p className="text-xs font-medium">Generating post-mortem report...</p>
       </div>
     );
   }
@@ -64,23 +63,23 @@ export const ReportPage: React.FC<ReportPageProps> = ({
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-4">
       {/* Top Header & Export Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-navy-800">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={onBack}
-            className="p-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-300 transition-colors"
-            title="Back to Investigation Workspace"
+            className="p-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-xs transition-colors"
+            title="Back to Workspace"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-              <FileText className="h-6 w-6 text-cyan-400" />
-              <span>Incident Post-Mortem Report</span>
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <FileText className="h-5 w-5 text-emerald-600" />
+              <span>Incident Post-Mortem</span>
             </h1>
-            <p className="text-xs font-mono text-cyan-400">
+            <p className="text-xs font-mono text-emerald-800">
               {incident.id} • {incident.title}
             </p>
           </div>
@@ -89,21 +88,21 @@ export const ReportPage: React.FC<ReportPageProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={copyToClipboard}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-300 border border-navy-700 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-xs transition-colors"
           >
-            {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
             <span>{copied ? 'Copied' : 'Copy MD'}</span>
           </button>
           <button
             onClick={downloadMarkdown}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-300 border border-navy-700 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-xs transition-colors"
           >
-            <Download className="h-3.5 w-3.5 text-cyan-400" />
-            <span>Download Markdown</span>
+            <Download className="h-3.5 w-3.5 text-slate-600" />
+            <span>Download MD</span>
           </button>
           <button
             onClick={downloadJson}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-semibold shadow-md shadow-cyan-600/30 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-all"
           >
             <Download className="h-3.5 w-3.5" />
             <span>Download JSON</span>
@@ -111,74 +110,74 @@ export const ReportPage: React.FC<ReportPageProps> = ({
         </div>
       </div>
 
-      {/* Post-Mortem Report Card */}
-      <div className="p-8 rounded-2xl bg-navy-900 border border-navy-800 shadow-2xl space-y-8 text-slate-200">
+      {/* Post-Mortem Document */}
+      <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-xs space-y-6 text-slate-800">
         
         {/* Header Block */}
-        <div className="border-b border-navy-800 pb-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="border-b border-slate-100 pb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <span className="text-xs font-mono uppercase tracking-wider text-cyan-400 font-semibold block mb-1">
-              Official Post-Mortem
+            <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-700 font-bold block mb-0.5">
+              Executive Incident Post-Mortem
             </span>
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               {incident.title}
             </h2>
-            <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-400">
-              <span>Service: <strong className="text-white font-mono">{incident.service}</strong></span>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+              <span>Service: <strong className="text-slate-800 font-mono">{incident.service}</strong></span>
               <span>•</span>
-              <span>Environment: <strong className="text-white font-mono">{incident.environment}</strong></span>
+              <span>Environment: <strong className="text-slate-800 font-mono">{incident.environment}</strong></span>
               <span>•</span>
-              <span>Severity: <strong className="text-red-400 font-mono">{incident.severity}</strong></span>
+              <span>Severity: <strong className="text-rose-600 font-mono">{incident.severity}</strong></span>
               <span>•</span>
-              <span>Status: <strong className="text-emerald-400 font-mono">{incident.status}</strong></span>
+              <span>Status: <strong className="text-emerald-700 font-mono">{incident.status}</strong></span>
             </div>
           </div>
 
-          <div className="text-right text-xs font-mono text-slate-400">
-            <div>Incident Opened: {new Date(incident.created_at).toLocaleString()}</div>
+          <div className="text-right text-[11px] font-mono text-slate-500">
+            <div>Opened: {new Date(incident.created_at).toLocaleString()}</div>
             {incident.resolved_at && (
-              <div className="text-emerald-400">Resolved At: {new Date(incident.resolved_at).toLocaleString()}</div>
+              <div className="text-emerald-700 font-semibold">Resolved: {new Date(incident.resolved_at).toLocaleString()}</div>
             )}
           </div>
         </div>
 
-        {/* 1. Executive Summary */}
-        <section className="space-y-3">
-          <h3 className="text-base font-bold text-white border-l-4 border-cyan-500 pl-3">
+        {/* 1. Summary */}
+        <section className="space-y-2">
+          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-l-3 border-emerald-600 pl-2">
             1. Executive Summary & Impact
           </h3>
-          <p className="text-sm text-slate-300 leading-relaxed bg-navy-950/60 p-4 rounded-xl border border-navy-800">
+          <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200">
             {incident.description}
           </p>
         </section>
 
         {/* 2. Root Cause Analysis */}
-        <section className="space-y-3">
-          <h3 className="text-base font-bold text-white border-l-4 border-cyan-500 pl-3">
-            2. Root Cause Assessment & Tested Hypotheses
+        <section className="space-y-2.5">
+          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-l-3 border-emerald-600 pl-2">
+            2. Root Cause Assessment & Hypotheses
           </h3>
           
-          <div className="space-y-3">
+          <div className="space-y-2">
             {hypotheses.map(h => (
-              <div key={h.id} className="p-4 rounded-xl bg-navy-950/70 border border-navy-800 text-xs space-y-2">
+              <div key={h.id} className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-cyan-400">Rank #{h.rank}:</span>
-                    <span className="font-bold text-white text-sm">{h.title}</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-emerald-800">#{h.rank}</span>
+                    <span className="font-bold text-slate-900">{h.title}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-emerald-400 font-bold">{(h.confidence * 100).toFixed(0)}% Confidence</span>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                      h.status === 'SUPPORTED' ? 'bg-emerald-950 text-emerald-300' : 'bg-navy-800 text-slate-400'
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono text-emerald-800 font-bold">{(h.confidence * 100).toFixed(0)}%</span>
+                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                      h.status === 'SUPPORTED' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'
                     }`}>
                       {h.status}
                     </span>
                   </div>
                 </div>
-                <p className="text-slate-300">{h.explanation}</p>
-                <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-400 pt-1 font-mono">
-                  <span>Supporting: {h.supporting_evidence_ids.join(', ') || 'None'}</span>
-                  <span>Contradicting: {h.contradicting_evidence_ids.join(', ') || 'None'}</span>
+                <p className="text-slate-600">{h.explanation}</p>
+                <div className="flex flex-wrap items-center gap-3 text-[10px] text-slate-500 pt-0.5 font-mono">
+                  <span>Support: {h.supporting_evidence_ids.join(', ') || 'None'}</span>
+                  <span>Contradict: {h.contradicting_evidence_ids.join(', ') || 'None'}</span>
                 </div>
               </div>
             ))}
@@ -186,49 +185,49 @@ export const ReportPage: React.FC<ReportPageProps> = ({
         </section>
 
         {/* 3. Verification & Telemetry Audit */}
-        <section className="space-y-3">
-          <h3 className="text-base font-bold text-white border-l-4 border-cyan-500 pl-3">
-            3. Recovery Verification Audit
+        <section className="space-y-2">
+          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-l-3 border-emerald-600 pl-2">
+            3. Verification Audit
           </h3>
 
           {verification_results.length === 0 ? (
-            <p className="text-xs text-slate-500">No verification results recorded yet.</p>
+            <p className="text-xs text-slate-400">No verification results recorded yet.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {verification_results.map(v => (
-                <div key={v.id} className="p-4 rounded-xl bg-navy-950/70 border border-navy-800 text-xs space-y-3">
+                <div key={v.id} className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       {v.status === 'PASSED' ? (
-                        <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                       ) : (
-                        <XCircle className="h-5 w-5 text-rose-400" />
+                        <XCircle className="h-4 w-4 text-rose-600" />
                       )}
-                      <span className="font-bold text-white text-sm">Verification Status: {v.status}</span>
+                      <span className="font-bold text-slate-900">Status: {v.status}</span>
                     </div>
-                    <span className="font-mono text-slate-400 text-[11px]">{new Date(v.created_at).toLocaleString()}</span>
+                    <span className="font-mono text-slate-500 text-[10px]">{new Date(v.created_at).toLocaleTimeString()}</span>
                   </div>
-                  <p className="text-slate-300">{v.summary}</p>
+                  <p className="text-slate-600">{v.summary}</p>
                 </div>
               ))}
             </div>
           )}
         </section>
 
-        {/* 4. Lessons Learned & Follow-up */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 rounded-xl bg-navy-950/70 border border-navy-800 space-y-2">
-            <h4 className="text-sm font-bold text-emerald-400">Lessons Learned</h4>
-            <ul className="list-disc list-inside text-xs text-slate-300 space-y-1">
+        {/* 4. Lessons Learned */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
+            <h4 className="text-xs font-bold text-emerald-800">Lessons Learned</h4>
+            <ul className="list-disc list-inside text-xs text-slate-600 space-y-0.5">
               {lessons_learned.map((l, i) => (
                 <li key={i}>{l}</li>
               ))}
             </ul>
           </div>
 
-          <div className="p-4 rounded-xl bg-navy-950/70 border border-navy-800 space-y-2">
-            <h4 className="text-sm font-bold text-cyan-400">Follow-up Action Items</h4>
-            <ol className="list-decimal list-inside text-xs text-slate-300 space-y-1">
+          <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
+            <h4 className="text-xs font-bold text-slate-800">Follow-up Action Items</h4>
+            <ol className="list-decimal list-inside text-xs text-slate-600 space-y-0.5">
               {follow_up_recommendations.map((f, i) => (
                 <li key={i}>{f}</li>
               ))}
@@ -240,4 +239,3 @@ export const ReportPage: React.FC<ReportPageProps> = ({
     </div>
   );
 };
-
