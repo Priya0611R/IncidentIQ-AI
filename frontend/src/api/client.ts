@@ -162,6 +162,53 @@ export const apiClient = {
   getEvaluationMetrics: async () => {
     const res = await api.get('/evaluation/metrics');
     return res.data;
+  },
+
+  // Monitoring & Telemetry Ingestion
+  getMonitoringStatus: async () => {
+    const res = await api.get('/monitoring/status');
+    return res.data;
+  },
+
+  getMonitoringConnections: async () => {
+    const res = await api.get('/monitoring/connections');
+    return res.data;
+  },
+
+  testMonitoringConnection: async (connId: string) => {
+    const res = await api.post(`/monitoring/connections/${connId}/test`);
+    return res.data;
+  },
+
+  // Simulation Controls
+  startSimulation: async (scenarioId?: string, intervalSeconds: number = 12) => {
+    const res = await api.post('/simulation/start', null, {
+      params: { scenario_id: scenarioId, interval_seconds: intervalSeconds }
+    });
+    return res.data;
+  },
+
+  stopSimulation: async () => {
+    const res = await api.post('/simulation/stop');
+    return res.data;
+  },
+
+  getSimulationStatus: async () => {
+    const res = await api.get('/simulation/status');
+    return res.data;
+  },
+
+  triggerSimulationTick: async (injectAnomaly: boolean = false) => {
+    const res = await api.post('/simulation/tick', null, {
+      params: { inject_anomaly: injectAnomaly }
+    });
+    return res.data;
+  },
+
+  // Detections Feed
+  getDetections: async (params?: { status?: string; service?: string; limit?: number }) => {
+    const res = await api.get('/detections', { params });
+    return res.data;
   }
 };
 

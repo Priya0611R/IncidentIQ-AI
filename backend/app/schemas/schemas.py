@@ -189,3 +189,102 @@ class ReportResponse(BaseModel):
     follow_up_recommendations: List[str] = []
     markdown_report: str
 
+# Monitoring Connection schemas
+class MonitoringConnectionBase(BaseModel):
+    name: str
+    provider: str
+    endpoint: Optional[str] = None
+    config_json: Dict[str, Any] = {}
+
+class MonitoringConnectionCreate(MonitoringConnectionBase):
+    pass
+
+class MonitoringConnectionResponse(MonitoringConnectionBase):
+    id: str
+    status: str
+    last_ingestion_at: Optional[datetime] = None
+    last_error: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Detection Event schemas
+class DetectionEventResponse(BaseModel):
+    id: str
+    service: str
+    detection_type: str
+    severity: str
+    observed_value: Optional[float] = None
+    baseline_value: Optional[float] = None
+    threshold_value: Optional[float] = None
+    time_window: str
+    explanation: str
+    evidence_ids: List[str] = []
+    status: str
+    incident_id: Optional[str] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Telemetry Record schemas
+class TelemetryRecordCreate(BaseModel):
+    source: str
+    event_type: str
+    service: str
+    timestamp: Optional[datetime] = None
+    severity: str = "INFO"
+    metrics: Dict[str, float] = {}
+    logs: Optional[str] = None
+    raw_payload: Dict[str, Any] = {}
+    is_synthetic: bool = True
+
+class TelemetryRecordResponse(BaseModel):
+    id: str
+    source: str
+    event_type: str
+    service: str
+    timestamp: datetime
+    ingested_at: datetime
+    severity: str
+    normalized_payload: Dict[str, Any]
+    is_synthetic: bool
+    data_quality: str
+
+    class Config:
+        from_attributes = True
+
+# Prometheus Alert webhook schema
+class PrometheusAlert(BaseModel):
+    status: str = "firing"
+    labels: Dict[str, str] = {}
+    annotations: Dict[str, str] = {}
+    startsAt: Optional[str] = None
+    endsAt: Optional[str] = None
+    generatorURL: Optional[str] = None
+    fingerprint: Optional[str] = None
+
+class PrometheusWebhookPayload(BaseModel):
+    version: Optional[str] = "4"
+    groupKey: Optional[str] = None
+    truncatedAlerts: Optional[int] = 0
+    status: str = "firing"
+    receiver: Optional[str] = None
+    groupLabels: Dict[str, str] = {}
+    commonLabels: Dict[str, str] = {}
+    commonAnnotations: Dict[str, str] = {}
+    externalURL: Optional[str] = None
+    alerts: List[PrometheusAlert] = []
+
+# Simulation status schema
+class SimulationStatusResponse(BaseModel):
+    is_running: bool
+    scenario_id: Optional[str] = None
+    emitted_count: int = 0
+    current_phase: str = "IDLE"
+    poll_interval_seconds: int = 15
+    active_injected_anomaly: Optional[str] = None
+
+

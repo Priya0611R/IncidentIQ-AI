@@ -1,4 +1,5 @@
 import logging
+import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,6 +8,8 @@ from app.config import settings
 from app.database import engine, Base, SessionLocal
 from app.api.routes import router
 from app.services.data_loader import load_initial_scenarios
+from app.jobs.job_queue import job_queue
+from app.ingestion.simulation import synthetic_generator
 
 logging.basicConfig(
     level=getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO),
@@ -35,8 +38,20 @@ async def lifespan(app: FastAPI):
     else:
         logger.warning("No valid GEMINI_API_KEY detected. Running in deterministic DEMO_FALLBACK mode.")
 
+    # Start persistent background job worker loop
+    worker_task = asyncio.create_task(job_queue.start_worker_loop(poll_interval_seconds=3))
+
     yield
-    logger.info("Shutting down IncidentIQ application.")
+
+    logger.info("Shutting down IncidentIQ application...")
+    job_queue.stop_worker_loop()
+    synthetic_generator.stop()
+    worker_task.cancel()
+    try:
+        await worker_task
+    except asyncio.CancelledError:
+        pass
+    logger.info("IncidentIQ application successfully shutdown.")
 
 app = FastAPI(
     title="AI-Powered Autonomous Incident Investigation and Recovery System",

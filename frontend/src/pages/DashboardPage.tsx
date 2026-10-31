@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   AlertOctagon, 
   Activity, 
@@ -11,10 +11,17 @@ import {
   Database,
   Layers,
   Wrench,
-  Sparkles
+  Sparkles,
+  Radio,
+  Play,
+  Square,
+  Zap,
+  RefreshCw,
+  BellRing
 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
-import { DashboardStats, Incident } from '../types';
+import { DashboardStats, Incident, MonitoringStatus, DetectionEvent } from '../types';
+import { apiClient } from '../api/client';
 
 interface DashboardPageProps {
   stats: DashboardStats | null;
@@ -49,6 +56,62 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onLoadScenarios,
   loading
 }) => {
+  const [monitoring, setMonitoring] = useState<MonitoringStatus | null>(null);
+  const [detections, setDetections] = useState<DetectionEvent[]>([]);
+  const [selectedScenario, setSelectedScenario] = useState('SCENARIO_DB_POOL_EXHAUSTION');
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+
+  const fetchMonitoringData = async () => {
+    try {
+      const [monStatus, detList] = await Promise.all([
+        apiClient.getMonitoringStatus(),
+        apiClient.getDetections({ limit: 8 })
+      ]);
+      setMonitoring(monStatus);
+      setIsSimulating(monStatus.is_simulating);
+      setDetections(detList);
+    } catch (e) {
+      console.warn("Could not fetch live monitoring status", e);
+    }
+  };
+
+  useEffect(() => {
+    fetchMonitoringData();
+    const interval = setInterval(fetchMonitoringData, 6000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleStartSimulation = async () => {
+    setActionLoading(true);
+    try {
+      await apiClient.startSimulation(selectedScenario, 12);
+      await fetchMonitoringData();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleStopSimulation = async () => {
+    setActionLoading(true);
+    try {
+      await apiClient.stopSimulation();
+      await fetchMonitoringData();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleTriggerTick = async () => {
+    setActionLoading(true);
+    try {
+      await apiClient.triggerSimulationTick(true);
+      await fetchMonitoringData();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   if (loading && !stats) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-slate-400">
@@ -179,6 +242,157 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
           <div className="mt-1 text-[11px] text-purple-500/80">Investigation speed</div>
         </div>
+      </div>
+
+      {/* Autonomous Ingestion & Live Telemetry Monitoring Console */}
+      <div className="p-5 rounded-xl bg-gradient-to-r from-navy-900 via-navy-900 to-navy-950 border border-cyan-900/40 shadow-lg">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-navy-800">
+          <div className="flex items-center gap-3">
+            <div className={`p-2.5 rounded-lg border ${
+              monitoring?.active_provider === 'PROMETHEUS'
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                : isSimulating
+                ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400'
+                : 'bg-slate-800 border-slate-700 text-slate-400'
+            }`}>
+              <Radio className={`h-5 w-5 ${isSimulating ? 'animate-pulse text-cyan-400' : ''}`} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-white">Autonomous Ingestion & Telemetry Monitor</h3>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase border ${
+                  monitoring?.active_provider === 'PROMETHEUS'
+                    ? 'bg-emerald-950 text-emerald-400 border-emerald-700'
+                    : isSimulating
+                    ? 'bg-cyan-950 text-cyan-300 border-cyan-700 animate-pulse'
+                    : 'bg-navy-950 text-slate-400 border-navy-800'
+                }`}>
+                  {monitoring?.mode_label || 'AWAITING TELEMETRY'}
+                </span>
+              </div>
+              <p className="text-xs text-slate-400">
+                Continuous signal ingestion, multi-tier anomaly detection, automatic event correlation, and autonomous background investigation.
+              </p>
+            </div>
+          </div>
+
+          {/* Quick Controls */}
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={selectedScenario}
+              onChange={(e) => setSelectedScenario(e.target.value)}
+              disabled={isSimulating || actionLoading}
+              className="bg-navy-950 text-slate-200 border border-navy-700 rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-cyan-500 outline-none disabled:opacity-50"
+            >
+              <option value="SCENARIO_DB_POOL_EXHAUSTION">Scenario: DB Pool Saturation (orders-service)</option>
+              <option value="SCENARIO_CHECKOUT_GATEWAY_TIMEOUT">Scenario: 504 Gateway Timeout (checkout-service)</option>
+              <option value="SCENARIO_DNS_SERVFAIL">Scenario: DNS SERVFAIL Storm (auth-service)</option>
+              <option value="SCENARIO_MTU_FRAGMENTATION">Scenario: VPC MTU Dropping (notification-service)</option>
+            </select>
+
+            {isSimulating ? (
+              <button
+                onClick={handleStopSimulation}
+                disabled={actionLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-500 text-white text-xs font-semibold shadow-sm transition-all"
+              >
+                <Square className="h-3.5 w-3.5" />
+                <span>Stop Engine</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleStartSimulation}
+                disabled={actionLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-sm transition-all"
+              >
+                <Play className="h-3.5 w-3.5" />
+                <span>Start Autonomous Engine</span>
+              </button>
+            )}
+
+            <button
+              onClick={handleTriggerTick}
+              disabled={actionLoading}
+              title="Immediately inject a synthetic failure telemetry tick across services"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-200 border border-navy-700 text-xs font-medium transition-all"
+            >
+              <Zap className="h-3.5 w-3.5 text-amber-400" />
+              <span>Inject Anomaly Tick</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Telemetry Stream Health Bar */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-xs">
+          <div className="bg-navy-950/60 p-2.5 rounded-lg border border-navy-800">
+            <span className="text-slate-400 block text-[11px]">Telemetry Ingested (24h)</span>
+            <span className="text-slate-100 font-mono font-bold text-sm">
+              {monitoring?.total_telemetry_records ?? 0} records
+            </span>
+          </div>
+          <div className="bg-navy-950/60 p-2.5 rounded-lg border border-navy-800">
+            <span className="text-slate-400 block text-[11px]">Active Anomaly Detections</span>
+            <span className="text-amber-400 font-mono font-bold text-sm">
+              {monitoring?.active_detections ?? 0} active
+            </span>
+          </div>
+          <div className="bg-navy-950/60 p-2.5 rounded-lg border border-navy-800">
+            <span className="text-slate-400 block text-[11px]">Ingestion Freshness</span>
+            <span className="text-slate-300 font-mono text-[11px]">
+              {monitoring?.latest_telemetry_at ? new Date(monitoring.latest_telemetry_at).toLocaleTimeString() : 'Awaiting data'}
+            </span>
+          </div>
+          <div className="bg-navy-950/60 p-2.5 rounded-lg border border-navy-800">
+            <span className="text-slate-400 block text-[11px]">Webhook Endpoint</span>
+            <span className="text-cyan-400 font-mono text-[11px] truncate block" title="/api/monitoring/webhooks/prometheus">
+              /api/monitoring/webhooks/prometheus
+            </span>
+          </div>
+        </div>
+
+        {/* Live Detected Anomalies Feed */}
+        {detections.length > 0 && (
+          <div className="mt-4 pt-3 border-t border-navy-800/80">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <BellRing className="h-3.5 w-3.5 text-cyan-400" />
+                Recent Anomaly Detections & Correlated Incidents
+              </span>
+              <span className="text-[11px] text-slate-400">Auto-correlated into background jobs</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+              {detections.map((d) => (
+                <div
+                  key={d.id}
+                  onClick={() => d.incident_id && onSelectIncident(d.incident_id, 'workspace')}
+                  className={`p-2.5 rounded-lg bg-navy-950/80 border text-xs transition-colors ${
+                    d.incident_id ? 'border-cyan-800/60 hover:border-cyan-500 cursor-pointer' : 'border-navy-800'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono font-semibold text-cyan-300">{d.service}</span>
+                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                      d.severity === 'CRITICAL' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-300'
+                    }`}>
+                      {d.detection_type}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 mt-1 line-clamp-1">{d.explanation}</p>
+                  <div className="flex items-center justify-between mt-1 text-[10px] text-slate-400">
+                    <span>{new Date(d.created_at).toLocaleTimeString()}</span>
+                    {d.incident_id ? (
+                      <span className="text-cyan-400 font-mono hover:underline flex items-center gap-0.5">
+                        Incident: {d.incident_id} <ArrowRight className="h-2.5 w-2.5" />
+                      </span>
+                    ) : (
+                      <span className="text-slate-500 italic">Correlating...</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Distribution Charts */}

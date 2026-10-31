@@ -180,3 +180,69 @@ class TimelineEvent(Base):
 
     incident = relationship("Incident", back_populates="timeline_events")
 
+
+class TelemetryRecord(Base):
+    __tablename__ = "telemetry_records"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid, index=True)
+    source = Column(String(64), nullable=False, index=True) # prometheus, simulation, datadog, etc.
+    event_type = Column(String(64), nullable=False, index=True) # metric, log, alert, trace
+    service = Column(String(128), nullable=False, index=True)
+    timestamp = Column(DateTime, nullable=False, index=True)
+    ingested_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    severity = Column(String(32), default="INFO", nullable=False)
+    normalized_payload_json = Column(Text, default="{}", nullable=False)
+    raw_payload_json = Column(Text, default="{}", nullable=False)
+    is_synthetic = Column(Boolean, default=True, nullable=False)
+    data_quality = Column(String(32), default="VALID", nullable=False)
+
+
+class MonitoringConnection(Base):
+    __tablename__ = "monitoring_connections"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid, index=True)
+    name = Column(String(128), nullable=False)
+    provider = Column(String(64), nullable=False, index=True) # prometheus, opentelemetry, datadog, simulation
+    status = Column(String(32), default="DISCONNECTED", nullable=False) # CONNECTED, DISCONNECTED, DEGRADED, SIMULATION_MODE
+    endpoint = Column(String(255), nullable=True)
+    last_ingestion_at = Column(DateTime, nullable=True)
+    last_error = Column(Text, nullable=True)
+    config_json = Column(Text, default="{}", nullable=False) # non-secret metadata
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+
+class DetectionEvent(Base):
+    __tablename__ = "detection_events"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid, index=True)
+    service = Column(String(128), nullable=False, index=True)
+    detection_type = Column(String(64), nullable=False, index=True) # threshold_violation, change_point, isolation_forest, log_pattern, prometheus_alert
+    severity = Column(String(32), default="MEDIUM", nullable=False)
+    observed_value = Column(Float, nullable=True)
+    baseline_value = Column(Float, nullable=True)
+    threshold_value = Column(Float, nullable=True)
+    time_window = Column(String(64), default="5m", nullable=False)
+    explanation = Column(Text, nullable=False)
+    evidence_ids = Column(Text, default="[]", nullable=False) # JSON array of evidence IDs
+    status = Column(String(32), default="NEW", nullable=False) # NEW, CORRELATED, IGNORED
+    incident_id = Column(String(64), ForeignKey("incidents.id", ondelete="SET NULL"), nullable=True, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+
+
+class BackgroundJob(Base):
+    __tablename__ = "background_jobs"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid, index=True)
+    job_type = Column(String(64), nullable=False, index=True) # INVESTIGATION, VERIFICATION, SIMULATION_EMIT, DETECTION_EVAL
+    status = Column(String(32), default="PENDING", nullable=False, index=True) # PENDING, RUNNING, COMPLETED, FAILED
+    payload_json = Column(Text, default="{}", nullable=False)
+    attempts = Column(Integer, default=0, nullable=False)
+    max_attempts = Column(Integer, default=3, nullable=False)
+    scheduled_for = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    started_at = Column(DateTime, nullable=True)
+    completed_at = Column(DateTime, nullable=True)
+    error_message = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+

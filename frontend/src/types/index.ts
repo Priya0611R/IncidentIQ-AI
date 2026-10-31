@@ -142,3 +142,37 @@ export interface IncidentReport {
   markdown_report: string;
 }
 
+export interface DetectionEvent {
+  id: string;
+  service: string;
+  detection_type: string;
+  severity: string;
+  observed_value?: number;
+  baseline_value?: number;
+  threshold_value?: number;
+  time_window: string;
+  explanation: string;
+  evidence_ids: string[];
+  status: string;
+  incident_id?: string;
+  created_at: string;
+}
+
+export interface MonitoringStatus {
+  active_provider: 'PROMETHEUS' | 'SIMULATION' | 'IDLE';
+  mode_label: string;
+  is_simulating: boolean;
+  simulation_scenario?: string;
+  total_telemetry_records: number;
+  active_detections: number;
+  latest_telemetry_at?: string;
+  connections: Array<{
+    id: string;
+    name: string;
+    provider: string;
+    status: string;
+    endpoint: string;
+    last_ingestion_at?: string;
+  }>;
+}
+

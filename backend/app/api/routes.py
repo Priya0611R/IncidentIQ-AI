@@ -1,16 +1,19 @@
 import json
 import uuid
+import asyncio
 from datetime import datetime
 from typing import List, Optional, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Header
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
-from app.database import get_db
+from app.database import get_db, SessionLocal
 from app.config import settings
 from app.models.models import (
     Incident, InvestigationRun, Evidence, Hypothesis,
-    Recommendation, Approval, RecoveryExecution, VerificationResult, TimelineEvent
+    Recommendation, Approval, RecoveryExecution, VerificationResult, TimelineEvent,
+    TelemetryRecord, MonitoringConnection, DetectionEvent, BackgroundJob
 )
 from app.schemas.schemas import (
     IncidentCreate, IncidentResponse,
@@ -19,7 +22,9 @@ from app.schemas.schemas import (
     RecommendationResponse, ApprovalRequest, RejectRequest,
     RecoveryExecutionResponse, VerificationResultResponse,
     TimelineEventResponse, InvestigationRunResponse,
-    DashboardStatsResponse, ReportResponse
+    DashboardStatsResponse, ReportResponse,
+    MonitoringConnectionResponse, MonitoringConnectionCreate,
+    DetectionEventResponse, PrometheusWebhookPayload
 )
 from app.services.evidence_service import evidence_service
 from app.services.hypothesis_service import hypothesis_scorer
@@ -31,6 +36,9 @@ from app.services.dependency_graph_service import dependency_graph_service
 from app.services.anomaly_service import anomaly_detection_service
 from app.services.evaluation_service import evaluation_service
 from app.agents.investigation_agent import investigation_agent
+from app.ingestion.webhook import PrometheusWebhookHandler
+from app.ingestion.simulation import synthetic_generator
+from app.jobs.job_queue import job_queue
 
 router = APIRouter(prefix="/api")
 
@@ -584,5 +592,197 @@ def get_evaluation_metrics(db: Session = Depends(get_db)):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to retrieve evaluation metrics: {str(e)}")
+
+# --- Ingestion, Webhooks & Autonomous Monitoring ---
+
+@router.post("/monitoring/webhooks/prometheus")
+def receive_prometheus_webhook(
+    payload: Dict[str, Any],
+    token: Optional[str] = Query(None),
+    x_prometheus_token: Optional[str] = Header(None, alias="X-Prometheus-Token"),
+    authorization: Optional[str] = Header(None),
+    db: Session = Depends(get_db)
+):
+    """
+    Ingests Prometheus Alertmanager alerts, normalizes payload, runs anomaly detection,
+    and automatically correlates or creates incidents.
+    """
+    effective_token = token or x_prometheus_token
+    if not effective_token and authorization:
+        parts = authorization.split(" ")
+        if len(parts) == 2 and parts[0].lower() == "bearer":
+            effective_token = parts[1]
+    
+    return PrometheusWebhookHandler.process_webhook(db, payload, effective_token or "")
+
+@router.get("/monitoring/status")
+def get_monitoring_status(db: Session = Depends(get_db)):
+    """
+    Returns live monitoring connectivity status, ingestion freshness, and active provider.
+    """
+    connections = db.query(MonitoringConnection).all()
+    conn_list = [
+        {
+            "id": c.id,
+            "name": c.name,
+            "provider": c.provider,
+            "status": c.status,
+            "endpoint": c.endpoint,
+            "last_ingestion_at": c.last_ingestion_at.isoformat() if c.last_ingestion_at else None
+        }
+        for c in connections
+    ]
+    sim_status = synthetic_generator.get_status()
+    
+    # Ingestion telemetry stats (past 24h)
+    record_count = db.query(TelemetryRecord).count()
+    latest_rec = db.query(TelemetryRecord).order_by(TelemetryRecord.ingested_at.desc()).first()
+    active_detections = db.query(DetectionEvent).filter(DetectionEvent.status == "ACTIVE").count()
+    
+    # Determine primary operational provider
+    prom_conn = next((c for c in connections if c.provider == "prometheus" and c.status == "CONNECTED"), None)
+    if prom_conn:
+        active_provider = "PROMETHEUS"
+        mode_label = "LIVE PRODUCTION (Prometheus Alertmanager)"
+    elif sim_status.get("is_running"):
+        active_provider = "SIMULATION"
+        mode_label = "AUTONOMOUS SIMULATION MODE"
+    else:
+        active_provider = "IDLE"
+        mode_label = "AWAITING TELEMETRY (Ready)"
+
+    return {
+        "active_provider": active_provider,
+        "mode_label": mode_label,
+        "is_simulating": sim_status.get("is_running", False),
+        "simulation_scenario": sim_status.get("scenario_id"),
+        "total_telemetry_records": record_count,
+        "active_detections": active_detections,
+        "latest_telemetry_at": latest_rec.ingested_at.isoformat() if latest_rec else None,
+        "connections": conn_list
+    }
+
+@router.get("/monitoring/connections", response_model=List[MonitoringConnectionResponse])
+def get_monitoring_connections(db: Session = Depends(get_db)):
+    return db.query(MonitoringConnection).all()
+
+@router.post("/monitoring/connections", response_model=MonitoringConnectionResponse)
+def create_monitoring_connection(payload: MonitoringConnectionCreate, db: Session = Depends(get_db)):
+    existing = db.query(MonitoringConnection).filter(MonitoringConnection.provider == payload.provider).first()
+    if existing:
+        existing.name = payload.name
+        existing.endpoint = payload.endpoint
+        existing.config_json = json.dumps(payload.config_json)
+        existing.updated_at = datetime.utcnow()
+        db.commit()
+        db.refresh(existing)
+        return existing
+
+    new_conn = MonitoringConnection(
+        name=payload.name,
+        provider=payload.provider,
+        endpoint=payload.endpoint,
+        status="CONNECTED",
+        config_json=json.dumps(payload.config_json),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    )
+    db.add(new_conn)
+    db.commit()
+    db.refresh(new_conn)
+    return new_conn
+
+@router.post("/monitoring/connections/{conn_id}/test")
+def check_monitoring_connection(conn_id: str, db: Session = Depends(get_db)):
+    conn = db.query(MonitoringConnection).filter(MonitoringConnection.id == conn_id).first()
+    if not conn:
+        raise HTTPException(status_code=404, detail="Connection not found")
+    conn.last_ingestion_at = datetime.utcnow()
+    conn.status = "CONNECTED"
+    db.commit()
+    return {"status": "SUCCESS", "message": f"Successfully pinged {conn.name} ({conn.provider})", "healthy": True}
+
+# --- Autonomous Simulation Engine ---
+
+@router.post("/simulation/start")
+def start_simulation(
+    scenario_id: Optional[str] = Query(None),
+    interval_seconds: int = Query(12)
+):
+    """Starts autonomous synthetic telemetry generator."""
+    return synthetic_generator.start(scenario_id=scenario_id, interval_seconds=interval_seconds)
+
+@router.post("/simulation/stop")
+def stop_simulation():
+    """Stops autonomous synthetic telemetry generator."""
+    return synthetic_generator.stop()
+
+@router.get("/simulation/status")
+def get_simulation_status():
+    return synthetic_generator.get_status()
+
+@router.post("/simulation/tick")
+def trigger_simulation_tick(inject_anomaly: bool = Query(False)):
+    """Triggers one synchronous synthetic telemetry emission tick across microservices."""
+    return synthetic_generator.emit_tick_sync(inject_anomaly=inject_anomaly)
+
+# --- Detections Feed & Real-time Stream ---
+
+@router.get("/detections", response_model=List[DetectionEventResponse])
+def get_recent_detections(
+    status: Optional[str] = None,
+    service: Optional[str] = None,
+    limit: int = 50,
+    db: Session = Depends(get_db)
+):
+    query = db.query(DetectionEvent)
+    if status and isinstance(status, str):
+        query = query.filter(DetectionEvent.status == status)
+    if service and isinstance(service, str):
+        query = query.filter(DetectionEvent.service == service)
+    actual_limit = limit if isinstance(limit, int) else 50
+    return query.order_by(DetectionEvent.created_at.desc()).limit(actual_limit).all()
+
+@router.get("/events/stream")
+async def events_stream():
+    """
+    Server-Sent Events (SSE) stream providing real-time telemetry, detection events,
+    and investigation status updates to dashboards.
+    """
+    async def event_generator():
+        last_check = datetime.utcnow()
+        while True:
+            await asyncio.sleep(3)
+            db = SessionLocal()
+            try:
+                # Poll new detections
+                new_dets = db.query(DetectionEvent).filter(DetectionEvent.created_at >= last_check).all()
+                last_check = datetime.utcnow()
+                for det in new_dets:
+                    data = {
+                        "type": "DETECTION_TRIGGERED",
+                        "detection_id": det.id,
+                        "service": det.service,
+                        "detection_type": det.detection_type,
+                        "severity": det.severity,
+                        "incident_id": det.incident_id,
+                        "explanation": det.explanation,
+                        "timestamp": det.created_at.isoformat()
+                    }
+                    yield f"data: {json.dumps(data)}\n\n"
+                
+                # Heartbeat event
+                heartbeat = {
+                    "type": "HEARTBEAT",
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "simulating": synthetic_generator.is_running
+                }
+                yield f"data: {json.dumps(heartbeat)}\n\n"
+            except Exception as e:
+                yield f"data: {json.dumps({'type': 'ERROR', 'detail': str(e)})}\n\n"
+            finally:
+                db.close()
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 

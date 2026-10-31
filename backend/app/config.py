@@ -18,6 +18,15 @@ class Settings(BaseSettings):
     INVESTIGATION_MAX_TOOLS: int = Field(default=12, env="INVESTIGATION_MAX_TOOLS")
     DATA_DIR: str = Field(default="data", env="DATA_DIR")
 
+    # Autonomy & Monitoring Settings
+    MONITORING_MODE: str = Field(default="simulation", env="MONITORING_MODE") # "simulation", "real", "hybrid"
+    PROMETHEUS_BASE_URL: str = Field(default="", env="PROMETHEUS_BASE_URL")
+    PROMETHEUS_ALERT_WEBHOOK_TOKEN: str = Field(default="incidentiq-secret-token", env="PROMETHEUS_ALERT_WEBHOOK_TOKEN")
+    DETECTION_POLL_INTERVAL_SECONDS: int = Field(default=15, env="DETECTION_POLL_INTERVAL_SECONDS")
+    TELEMETRY_STALE_AFTER_SECONDS: int = Field(default=120, env="TELEMETRY_STALE_AFTER_SECONDS")
+    SIMULATION_MODE: bool = Field(default=True, env="SIMULATION_MODE")
+    RECOVERY_REQUIRES_APPROVAL: bool = Field(default=True, env="RECOVERY_REQUIRES_APPROVAL")
+
     @property
     def cors_origin_list(self) -> List[str]:
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
