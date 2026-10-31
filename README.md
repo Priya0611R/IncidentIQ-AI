@@ -7,7 +7,7 @@
 
 ### 🔗 Quick Links & Presentation
 - **📖 [Executive Pitch Deck & Team Documentation (Cognify Crew)](./docs/README.md)** — Complete slide-by-slide project overview, team credits, architecture, and impact analysis ([PowerPoint Presentation Deck](./docs/IncidentIQ_AI.pptx)).
-- **🌐 Live Web Console:** [http://localhost:5173](http://localhost:5173) (Light Mode SRE Command Console)
+- **🌐 Live Web Console:** [http://127.0.0.1:5174](http://127.0.0.1:5174) or [http://localhost:5173](http://localhost:5173) (Light Mode SRE Command Console)
 - **⚡ Backend OpenAPI Docs:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 - **🧪 Automated Test Suite:** `pytest backend/tests/test_all_workflows.py -v` (23 passing tests)
 
