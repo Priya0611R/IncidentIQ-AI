@@ -1,4 +1,4 @@
-# IncidentIQ AI — Executive Pitch & System Overview
+# IncidentIQ AI — Executive Pitch & Presentation
 
 > **Tagline:** Investigate. Adapt. Recover. Verify.  
 > **Mission:** An AI incident investigator that turns fragmented production signals into evidence-backed diagnosis and safer recovery decisions.
