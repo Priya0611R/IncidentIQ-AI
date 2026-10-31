@@ -1,8 +1,60 @@
 # IncidentIQ AI: Autonomous Incident Investigation and Recovery System
 
-An enterprise-grade, autonomous Site Reliability Engineering (SRE) incident investigation and recovery platform. 
+> **Tagline:** *Investigate. Adapt. Recover. Verify.*  
+> **Mission:** An AI incident investigator that turns fragmented production signals into evidence-backed diagnosis and safer recovery decisions.
 
-IncidentIQ investigates technical incidents, gathers empirical evidence across distributed telemetry, tests competing root-cause hypotheses, scores and ranks them mathematically, recommends low-risk reversible mitigations, enforces human authorization, executes safe simulated recovery handlers, and audits post-recovery telemetry before declaring incident resolution.
+---
+
+### 🔗 Quick Links & Presentation
+- **📖 [Executive Pitch Deck & Team Presentation (Cognify Crew)](./PRESENTATION.md)** — Complete slide-by-slide project overview, team credits, architecture, and impact analysis.
+- **🌐 Live Web Console:** [http://localhost:5173](http://localhost:5173) (Light Mode SRE Command Console)
+- **⚡ Backend OpenAPI Docs:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **🧪 Automated Test Suite:** `pytest backend/tests/test_all_workflows.py -v` (23 passing tests)
+
+---
+
+## 👥 Cognify Crew (Project Team)
+
+| Team Member | Role / Focus |
+|:---|:---|
+| **Priya R** | AI & Backend Architecture / Lead |
+| **Vaishnavi S** | Autonomous Investigation & Agent Orchestration |
+| **Revathi M** | Anomaly Detection (Isolation Forest) & Telemetry Ingestion |
+| **Harini R** | SRE Workflows, Recovery Verification & Post-Mortem Analytics |
+| **Varshini S** | Frontend Experience, SRE Command Console & UI/UX Design |
+
+---
+
+## 🧭 The 8-Step Autonomous Lifecycle
+
+IncidentIQ AI implements an end-to-end evidence-based incident investigation workflow:
+
+```
+1. Collect Evidence   →   Logs, metrics, traces, alerts, deployments & configs
+2. Build Timeline     →   Chronological correlation of failure events
+3. Form Hypotheses    →   Multi-candidate root-cause formulation
+4. Investigate Tools  →   Dynamic tool calling (DNS, packet loss, config diffs)
+5. Identify Root Cause→   Scored & ranked with contradiction penalties
+6. Propose Recovery   →   Actionable, reversible remediation plan
+7. Request Approval   →   Strict human authorization gate
+8. Verify Evidence    →   Post-recovery SLA threshold audit
+```
+
+---
+
+## 🚨 Problem & Solution
+
+### The Problem
+*Production incident response is difficult and time-consuming:*
+1. **Scattered Signals:** Logs, metrics, traces, and alerts are isolated across disconnected tools.
+2. **Manual Investigation:** Engineers must manually cross-correlate gigabytes of telemetry under intense time pressure.
+3. **Uncertain & Risky Fixes:** Initial intuitive explanations are often wrong; untested changes risk worsening outages.
+
+### Our Solution — IncidentIQ AI
+*An AI-assisted incident investigator that turns fragmented signals into evidence-backed diagnosis and safer recovery decisions:*
+1. **Correlate and Analyze:** Combines logs, metrics, traces, and deployment history into an aligned incident timeline.
+2. **Adaptive Investigation:** Tests competing hypotheses against live diagnostics and adapts when evidence contradicts initial assumptions.
+3. **Safe Recovery & Verification:** Recommends verified mitigations, requires human approval for critical actions, and verifies resolution against SLA criteria.
 
 ---
 
