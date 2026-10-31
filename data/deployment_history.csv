@@ -1,0 +1,8 @@
+evidence_id,service,version,previous_version,deployed_at,deployed_by,status,commit_hash,changelog
+EV-DEP-101,checkout-service,v2.4.1,v2.4.0,2026-10-31T09:11:30Z,ci-cd-bot,COMPLETED,a7bc91e,"Feature: Added secondary payment token validation layer"
+EV-DEP-102,orders-service,v3.1.2,v3.1.1,2026-10-28T14:00:00Z,sre-deployer,COMPLETED,f84391d,"Chore: Routine dependencies patch and framework upgrade"
+EV-DEP-103,inventory-service,v1.9.0,v1.8.4,2026-10-29T11:20:00Z,ci-cd-bot,COMPLETED,c3194a2,"Feature: Added in-memory seasonal catalog pre-warm cache"
+EV-DEP-104,notification-service,v2.0.4,v2.0.3,2026-10-27T08:30:00Z,sre-deployer,COMPLETED,981bc01,"Fix: Adjusted email worker retry backoff exponent"
+EV-DEP-105,billing-service,v4.2.0,v4.1.9,2026-10-30T16:45:00Z,ci-cd-bot,COMPLETED,e72301a,"Security: Updated cryptography suite"
+EV-DEP-106,search-service,v1.5.0,v1.4.8,2026-10-25T10:00:00Z,ci-cd-bot,COMPLETED,55bca81,"Performance: Added query pre-parsing"
+

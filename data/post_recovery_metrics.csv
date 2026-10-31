@@ -1,0 +1,8 @@
+recovery_execution_id,incident_id,service,timestamp,cpu_percent,memory_percent,latency_ms,error_rate,db_connections,status_evaluation
+SIM-REC-001,INC-2026-001,checkout-service,2026-10-31T09:25:00Z,22.1,41.5,58,0.0005,12,PASSED
+SIM-REC-002,INC-2026-002,orders-service,2026-10-31T08:40:00Z,48.0,61.0,165,0.0020,38,PASSED
+SIM-REC-003,INC-2026-003,inventory-service,2026-10-31T07:55:00Z,24.0,38.2,75,0.0010,11,PASSED
+SIM-REC-004,INC-2026-004,notification-service,2026-10-31T06:20:00Z,19.2,38.5,82,0.0000,8,PASSED
+SIM-REC-005,INC-2026-005,billing-service,2026-10-31T05:30:00Z,15.5,32.1,44,0.0000,6,PASSED
+SIM-REC-006,INC-2026-006,search-service,2026-10-31T04:28:00Z,54.2,63.0,3150,0.1650,15,FAILED
+

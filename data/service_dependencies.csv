@@ -1,0 +1,11 @@
+service,depends_on,dependency_type,criticality,timeout_ms
+checkout-service,orders-service,HTTP_REST,CRITICAL,3000
+checkout-service,billing-service,HTTP_REST,CRITICAL,2500
+checkout-service,inventory-service,gRPC,CRITICAL,2000
+orders-service,orders-postgres-db,DATABASE,CRITICAL,5000
+orders-service,notification-service,ASYNC_QUEUE,MEDIUM,5000
+billing-service,payment-gateway-3p,EXTERNAL_REST,CRITICAL,6000
+notification-service,email-gateway,SMTP_TCP,HIGH,5000
+search-service,elasticsearch-cluster,ELASTICSEARCH_HTTP,CRITICAL,4000
+inventory-service,inventory-redis-cache,REDIS,HIGH,1000
+

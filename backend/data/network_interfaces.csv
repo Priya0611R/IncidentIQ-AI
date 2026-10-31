@@ -1,0 +1,5 @@
+evidence_id,service,interface_name,rx_bytes,tx_bytes,rx_packets,tx_packets,rx_errors,tx_errors,rx_dropped,tx_dropped,timestamp
+EV-NET-101,notification-service,eth0,104857600,83886080,820000,710000,12,4,4820,120,2026-10-31T06:06:00Z
+EV-NET-102,checkout-service,eth0,524288000,419430400,2400000,2100000,0,0,0,0,2026-10-31T09:14:00Z
+EV-NET-103,orders-service,eth0,314572800,251658240,1800000,1600000,0,0,0,0,2026-10-31T08:26:00Z
+EV-NET-104,edge-router-01,vlan100,8388608000,7549747200,45000000,41000000,140,82,18500,420,2026-10-31T03:10:00Z

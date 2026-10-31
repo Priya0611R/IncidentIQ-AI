@@ -1,0 +1,75 @@
+{
+  "dns_records": [
+    {
+      "domain": "email-gateway.vpc-east.internal",
+      "status": "SUCCESS",
+      "resolved_ips": ["10.240.12.8"],
+      "response_time_ms": 1.8,
+      "nameserver": "10.0.0.2"
+    },
+    {
+      "domain": "orders-postgres-db.prod.internal",
+      "status": "SUCCESS",
+      "resolved_ips": ["10.0.10.45"],
+      "response_time_ms": 1.2,
+      "nameserver": "10.0.0.2"
+    },
+    {
+      "domain": "external-auth-provider.global.net",
+      "status": "SERVFAIL",
+      "resolved_ips": [],
+      "response_time_ms": 2500.0,
+      "error": "Upstream authoritative nameserver timeout",
+      "nameserver": "8.8.8.8"
+    }
+  ],
+  "path_diagnostics": [
+    {
+      "source_service": "notification-service",
+      "destination_service": "email-gateway",
+      "hop_count": 4,
+      "avg_latency_ms": 185.4,
+      "packet_loss_pct": 24.5,
+      "mtu_bytes": 1420,
+      "bottleneck_hop": "10.240.0.1 (vpc-peering-gateway)",
+      "status": "DEGRADED"
+    },
+    {
+      "source_service": "checkout-service",
+      "destination_service": "orders-service",
+      "hop_count": 2,
+      "avg_latency_ms": 0.8,
+      "packet_loss_pct": 0.0,
+      "mtu_bytes": 9000,
+      "status": "HEALTHY"
+    },
+    {
+      "source_service": "billing-service",
+      "destination_service": "payment-gateway-3p",
+      "hop_count": 7,
+      "avg_latency_ms": 2400.0,
+      "packet_loss_pct": 48.0,
+      "bottleneck_hop": "198.51.100.1 (external-transit-provider)",
+      "status": "OUTAGE"
+    }
+  ],
+  "tcp_connection_errors": [
+    {
+      "service": "notification-service",
+      "destination": "email-gateway:2525",
+      "error_type": "TCP_RST_BURST",
+      "count": 412,
+      "syn_retransmits": 18,
+      "timestamp": "2026-10-31T06:07:00Z"
+    },
+    {
+      "service": "billing-service",
+      "destination": "payment-gateway-3p:443",
+      "error_type": "ETIMEDOUT",
+      "count": 680,
+      "syn_retransmits": 45,
+      "timestamp": "2026-10-31T05:16:00Z"
+    }
+  ]
+}
+

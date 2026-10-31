@@ -1,0 +1,34 @@
+evidence_id,timestamp,service,level,message,incident_id,metadata_json
+EV-LOG-101,2026-10-31T09:11:50Z,checkout-service,INFO,"Deploying artifact release-v2.4.1 to cluster prod-us-east-1",INC-2026-001,"{""build_id"": ""build-8472"", ""commit"": ""a7bc91""}"
+EV-LOG-102,2026-10-31T09:12:15Z,checkout-service,WARN,"Schema migration warning: column 'billing_address_v2' has no default value",INC-2026-001,"{""migration"": ""0042_checkout_schema.sql""}"
+EV-LOG-103,2026-10-31T09:13:02Z,checkout-service,ERROR,"Unhandled NullReferenceException in PaymentPayloadValidator.ValidateToken",INC-2026-001,"{""stack_trace"": ""Checkout.Api.Controllers.CheckoutController.Post() line 84""}"
+EV-LOG-104,2026-10-31T09:14:10Z,checkout-service,ERROR,"HTTP 502 Bad Gateway returned to client 198.51.100.24",INC-2026-001,"{""path"": ""/api/v1/checkout/process"", ""status_code"": 502}"
+EV-LOG-105,2026-10-31T09:15:30Z,api-gateway,ERROR,"Upstream service checkout-service failed to respond within 5000ms timeout",INC-2026-001,"{""upstream_addr"": ""10.0.4.12:8080"", ""duration_ms"": 5002}"
+
+EV-LOG-201,2026-10-31T08:24:10Z,orders-service,INFO,"Incoming orders batch processing triggered: 450 requests queued",INC-2026-002,"{""batch_id"": ""batch-9921"", ""worker_threads"": 16}"
+EV-LOG-202,2026-10-31T08:25:35Z,orders-service,WARN,"HikariPool-1 - Connection pool usage exceeded 90%: 92 of 100 connections active",INC-2026-002,"{""active_connections"": 92, ""max_connections"": 100, ""idle"": 0}"
+EV-LOG-203,2026-10-31T08:26:40Z,orders-service,ERROR,"HikariPool-1 - Connection is not available, request timed out after 30005ms",INC-2026-002,"{""pending_threads"": 45, ""timeout_ms"": 30000}"
+EV-LOG-204,2026-10-31T08:27:15Z,orders-service,ERROR,"org.postgresql.util.PSQLException: FATAL: remaining connection slots are reserved for non-replication superuser connections",INC-2026-002,"{""db_host"": ""orders-db.prod.internal""}"
+EV-LOG-205,2026-10-31T08:28:50Z,orders-service,ERROR,"OrderCreationTransaction failed: could not acquire JDBC connection",INC-2026-002,"{""order_id"": ""ORD-88124"", ""retry_count"": 3}"
+
+EV-LOG-301,2026-10-31T07:38:00Z,inventory-service,INFO,"Cache pre-warming started for seasonal catalog sync",INC-2026-003,"{""catalog_items"": 120000}"
+EV-LOG-302,2026-10-31T07:41:20Z,inventory-service,WARN,"JVM heap occupancy exceeded 85% threshold (7.1GB / 8.0GB)",INC-2026-003,"{""heap_used_mb"": 7240, ""heap_max_mb"": 8192}"
+EV-LOG-303,2026-10-31T07:43:45Z,inventory-service,WARN,"GC Pause [G1 Evacuation Pause (young) (to-space exhausted)]: 2840.4 ms",INC-2026-003,"{""pause_duration_ms"": 2840}"
+EV-LOG-304,2026-10-31T07:44:55Z,inventory-service,ERROR,"java.lang.OutOfMemoryError: Java heap space during HashMap.resize()",INC-2026-003,"{""thread"": ""catalog-loader-3""}"
+EV-LOG-305,2026-10-31T07:46:10Z,inventory-service,ERROR,"Health check probe failed: HTTP request timeout after 10000ms",INC-2026-003,"{""probe"": ""/health/liveness""}"
+
+EV-LOG-401,2026-10-31T06:03:00Z,notification-service,INFO,"Batch email notification dispatch dispatched 1200 messages",INC-2026-004,"{""channel"": ""email""}"
+EV-LOG-402,2026-10-31T06:05:40Z,notification-service,WARN,"TCP connection reset by peer when calling email-gateway:2525",INC-2026-004,"{""target"": ""email-gateway.vpc-east.internal:2525"", ""retransmits"": 12}"
+EV-LOG-403,2026-10-31T06:07:15Z,notification-service,ERROR,"SocketTimeoutException: Read timed out after 8000ms to email-gateway",INC-2026-004,"{""target_service"": ""email-gateway"", ""rtt_ms"": 8050}"
+EV-LOG-404,2026-10-31T06:08:50Z,notification-service,ERROR,"Circuit breaker tripped to OPEN state for downstream email-gateway",INC-2026-004,"{""state"": ""OPEN"", ""failure_rate"": 0.74}"
+
+EV-LOG-501,2026-10-31T05:14:00Z,billing-service,INFO,"Dynamic config update received via Consul key /config/billing/jwt_secret_expiry",INC-2026-005,"{""version"": 48, ""author"": ""infra-automation""}"
+EV-LOG-502,2026-10-31T05:15:20Z,billing-service,WARN,"JWT validator initialized with TOKEN_EXPIRY_SECONDS=0: all tokens immediately invalid",INC-2026-005,"{""param"": ""TOKEN_EXPIRY_SECONDS"", ""value"": 0}"
+EV-LOG-503,2026-10-31T05:16:05Z,billing-service,ERROR,"SecurityException: Bearer token is expired: issued 1730351760, expiry 1730351760",INC-2026-005,"{""client_id"": ""mobile-checkout-svc""}"
+EV-LOG-504,2026-10-31T05:17:30Z,billing-service,ERROR,"HTTP 401 Unauthorized returned to calling services: 100% token rejection rate",INC-2026-005,"{""rejection_count"": 520}"
+
+EV-LOG-601,2026-10-31T04:08:00Z,search-service,INFO,"Search query traffic volume normal: 280 queries/sec",INC-2026-006,"{""qps"": 280}"
+EV-LOG-602,2026-10-31T04:10:15Z,search-service,WARN,"Query latency p95 exceeded SLA limit: 3200ms vs 250ms target",INC-2026-006,"{""latency_ms"": 3200}"
+EV-LOG-603,2026-10-31T04:12:30Z,search-service,ERROR,"Elasticsearch node es-data-03 unresponsive, circuit_breaking_exception: parent circuit breaker triggered",INC-2026-006,"{""downstream"": ""elasticsearch-cluster"", ""node"": ""es-data-03""}"
+EV-LOG-604,2026-10-31T04:14:00Z,search-service,ERROR,"Elasticsearch query queue full on cluster: 503 rejected executions",INC-2026-006,"{""cluster_status"": ""RED"", ""unassigned_shards"": 4}"
+

@@ -1,0 +1,10 @@
+evidence_id,trace_id,service,operation,duration_ms,status_code,timestamp,error_message,incident_id
+EV-TRC-101,tr-ck-001,checkout-service,POST /api/v1/checkout/process,4250,502,2026-10-31T09:14:00Z,"PaymentPayloadValidator null reference exception",INC-2026-001
+EV-TRC-102,tr-ck-002,checkout-service,GET /api/v1/checkout/cart,4100,504,2026-10-31T09:14:30Z,"Gateway timeout awaiting checkout-service worker",INC-2026-001
+EV-TRC-201,tr-ord-001,orders-service,POST /api/v1/orders,30050,500,2026-10-31T08:26:40Z,"HikariPool connection acquisition timeout",INC-2026-002
+EV-TRC-202,tr-ord-002,orders-service,GET /api/v1/orders/ORD-88124,180,200,2026-10-31T08:28:10Z,,INC-2026-002
+EV-TRC-301,tr-inv-001,inventory-service,GET /api/v1/inventory/items/sku-842,6500,500,2026-10-31T07:44:00Z,"OutOfMemoryError during heap allocation",INC-2026-003
+EV-TRC-401,tr-not-001,notification-service,POST /api/v1/notify/email,8050,504,2026-10-31T06:07:15Z,"SocketTimeoutException reading from email-gateway",INC-2026-004
+EV-TRC-501,tr-bil-001,billing-service,POST /api/v1/billing/charge,52,401,2026-10-31T05:16:05Z,"Bearer token expired at issuance",INC-2026-005
+EV-TRC-601,tr-sch-001,search-service,GET /api/v1/search?q=jacket,3400,503,2026-10-31T04:12:30Z,"Circuit breaker triggered on elasticsearch-cluster",INC-2026-006
+

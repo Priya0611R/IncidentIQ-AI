@@ -1,0 +1,6 @@
+evidence_id,timestamp,service,source_ip,destination_ip,port,protocol,action,rule_id,reason
+EV-FW-101,2026-10-31T06:05:10Z,notification-service,10.0.4.18,10.240.12.8,2525,TCP,DROP,FW-RULE-982,"Egress SMTP throttling rule triggered"
+EV-FW-102,2026-10-31T06:06:22Z,notification-service,10.0.4.18,10.240.12.8,2525,TCP,DROP,FW-RULE-982,"Rate limit exceeded: 50 concurrent SYN packets"
+EV-FW-201,2026-10-31T03:15:30Z,payment-gateway,10.0.2.14,198.51.100.45,443,TCP,ALLOW,FW-RULE-101,"Standard HTTPS egress to certified processor"
+EV-FW-301,2026-10-31T02:40:15Z,api-gateway,192.0.2.88,10.0.1.5,80,TCP,DROP,FW-RULE-005,"DDoS mitigation blocklist match"
+

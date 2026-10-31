@@ -1,0 +1,7 @@
+evidence_id,service,parameter_name,previous_value,new_value,applied_at,applied_by,change_source
+EV-CFG-101,billing-service,TOKEN_EXPIRY_SECONDS,3600,0,2026-10-31T05:14:00Z,infra-automation,Consul Key-Value
+EV-CFG-102,orders-service,HIKARI_MAX_POOL_SIZE,100,100,2026-10-20T12:00:00Z,dba-team,Terraform DB Module
+EV-CFG-103,checkout-service,CIRCUIT_BREAKER_TIMEOUT_MS,5000,5000,2026-10-25T09:00:00Z,sre-lead,ConfigMap
+EV-CFG-104,inventory-service,JVM_XMX_HEAP_MB,8192,8192,2026-10-15T15:30:00Z,devops,Helm Chart Values
+EV-CFG-105,search-service,ES_CONNECTION_TIMEOUT_MS,3000,3000,2026-10-10T08:00:00Z,sre-team,ConfigMap
+

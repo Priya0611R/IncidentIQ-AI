@@ -1,0 +1,63 @@
+[
+  {
+    "id": "HIST-INC-801",
+    "title": "Post-release 502 Bad Gateway storm on Checkout",
+    "service": "checkout-service",
+    "category": "deployment_failure",
+    "severity": "CRITICAL",
+    "root_cause": "Regression introduced in validation middleware requiring backward incompatible schema fields",
+    "resolution": "Rollback deployment to previous stable release tag and patched validator",
+    "resolution_time_minutes": 18,
+    "recovery_action": "rollback_deployment",
+    "tags": ["deployment", "rollback", "502-bad-gateway", "middleware"]
+  },
+  {
+    "id": "HIST-INC-802",
+    "title": "Postgres connection pool saturation on Orders Service",
+    "service": "orders-service",
+    "category": "database_issue",
+    "severity": "CRITICAL",
+    "root_cause": "Long-running reporting query holding unindexed table locks, starving HikariCP connection pool",
+    "resolution": "Terminated idle and long-running reporting backend connections, scaled connection pool maximum to 150",
+    "resolution_time_minutes": 25,
+    "recovery_action": "pool_resize_and_cleanup",
+    "tags": ["database", "connection-pool", "hikari", "timeout", "postgres"]
+  },
+  {
+    "id": "HIST-INC-803",
+    "title": "JVM Heap exhaustion from catalog cache pre-load",
+    "service": "inventory-service",
+    "category": "resource_exhaustion",
+    "severity": "HIGH",
+    "root_cause": "Unbounded cache insertion during seasonal catalog preload without eviction policy",
+    "resolution": "Restarted service with cache eviction policy and configured soft memory ceiling",
+    "resolution_time_minutes": 15,
+    "recovery_action": "service_restart_with_cache_flush",
+    "tags": ["jvm", "oom", "garbage-collection", "cache", "memory"]
+  },
+  {
+    "id": "HIST-INC-804",
+    "title": "Downstream email provider TCP RST loop causing worker stall",
+    "service": "notification-service",
+    "category": "network_issue",
+    "severity": "MEDIUM",
+    "root_cause": "Email provider MTU mismatch causing dropped packets and TCP RST bursts across peering connection",
+    "resolution": "Enabled secondary circuit breaker route to backup SES SMTP endpoint",
+    "resolution_time_minutes": 32,
+    "recovery_action": "enable_circuit_breaker_and_fallback",
+    "tags": ["network", "tcp", "timeout", "circuit-breaker"]
+  },
+  {
+    "id": "HIST-INC-805",
+    "title": "Consul KV synchronization error resetting JWT TTL to zero",
+    "service": "billing-service",
+    "category": "configuration_issue",
+    "severity": "HIGH",
+    "root_cause": "Automation script pushed default 0 integer for TOKEN_EXPIRY_SECONDS",
+    "resolution": "Reverted Consul KV to 3600 seconds and hot-reloaded configuration",
+    "resolution_time_minutes": 10,
+    "recovery_action": "revert_config_change",
+    "tags": ["config", "consul", "auth", "jwt"]
+  }
+]
+

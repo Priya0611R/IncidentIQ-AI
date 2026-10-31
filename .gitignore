@@ -1,0 +1,33 @@
+# Virtual Environments
+backend/venv/
+venv/
+ENV/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite
+*.db
+.pytest_cache/
+
+# Node
+frontend/node_modules/
+node_modules/
+frontend/dist/
+dist/
+.npm
+*.log
+
+# Environment variables and API keys
+.env
+backend/.env
+frontend/.env
+*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
