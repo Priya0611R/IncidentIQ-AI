@@ -5,6 +5,12 @@
 
 ---
 
+### 📊 Presentation Slides & Decks
+- **🖥️ Google Slides:** [IncidentIQ AI Presentation (Google Slides)](https://docs.google.com/presentation/d/1HY0_idMfPe1P7hzwJUM8NTK0f2BHBIxG/edit?usp=sharing&ouid=106482162579105740095&rtpof=true&sd=true)
+- **📁 PowerPoint Deck:** [`IncidentIQ_AI.pptx`](./IncidentIQ_AI.pptx)
+
+---
+
 ## 👥 Cognify Crew (Project Team)
 
 | Team Member | Role / Focus |
